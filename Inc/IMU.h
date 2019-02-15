@@ -1,6 +1,6 @@
 #ifndef H_IMU_H
 #define H_IMU_H
-
+#include "main.h"
 #include "stm32f4xx_hal.h"
 #include "math.h"
 #include "mpu6050.h"
@@ -11,6 +11,7 @@
 //*********************************************************
 #define Mahony_twoKpDef        (2.0f * 0.7f)   // 2 * proportional gain
 #define Mahony_twoKiDef        (2.0f * 0.0f)   // 2 * integral gain
+
 
 //*********************************************************
 
@@ -32,6 +33,9 @@
 	 
 	 float Y_twokp;
 	 float Earth_acc_x,Earth_acc_y,Earth_acc_z;
+	 
+	 int   yaw_flag_for_return;
+	 float diff_yaw;
 	 	 
 }_IMU;
 

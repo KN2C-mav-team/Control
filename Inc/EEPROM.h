@@ -57,17 +57,37 @@
 #define  EEPROM_Pitch_Ki           0x003c
 #define  EEPROM_Pitch_Kd           0x003e
 
-#define  EEPROM_Altitude_Kp				 0x0040
-#define  EEPROM_Altitude_Ki				 0x0042
-#define  EEPROM_Altitude_Kd				 0x0044
-
 #define  EEPROM_Altitude_Velocity_Kp				 0x0046		//**//
 #define  EEPROM_Altitude_Velocity_Ki				 0x0048		//**//
 #define  EEPROM_Altitude_Velocity_Kd				 0x004a		//**//
 
-#define	 EEPROM_Position_Kp								 	 0x004c		//**//
-#define	 EEPROM_Position_Ki								 	 0x004e		//**//
-#define	 EEPROM_Position_Kd								 	 0x0050		//**//
+//#define	 EEPROM_Position_Kp								 	 0x004c		//**//
+//#define	 EEPROM_Position_Ki								 	 0x004e		//**//
+//#define	 EEPROM_Position_Kd								 	 0x0050		//**//
+
+#define  EEPROM_ORB_position_Kp              0x004c	  //moj
+#define  EEPROM_ORB_position_Ki            	 0x004e   //moj
+#define  EEPROM_ORB_position_Kd              0x0050   //moj
+
+#define	 EEPROM_opti_x_Kp								  	 0x0052		//**//
+#define	 EEPROM_opti_x_Ki								  	 0x0054		//**//
+#define	 EEPROM_opti_x_Kd								  	 0x0056   //**//
+
+#define	 EEPROM_opti_y_Kp								  	 0x0058		//**//
+#define	 EEPROM_opti_y_Ki								  	 0x006a		//**//
+#define	 EEPROM_opti_y_Kd								  	 0x006c   //**//
+ 
+#define  EEPROM_Altitude_take_off_Kp				 0x006e   //moj
+#define  EEPROM_Altitude_take_off_Ki				 0x0070   //moj
+#define  EEPROM_Altitude_take_off_Kd				 0x0072   //moj
+
+//#define  EEPROM_ORB_position_Kp              0x008a	  //moj
+//#define  EEPROM_ORB_position_Ki            	 0x008c   //moj
+//#define  EEPROM_ORB_position_Kd              0x008e   //moj
+
+#define	 EEPROM_Position_Kp								 	 0x008a		//**//
+#define	 EEPROM_Position_Ki								 	 0x008c		//**//
+#define	 EEPROM_Position_Kd								 	 0x008e		//**//
 
 
 

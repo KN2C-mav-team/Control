@@ -1,4 +1,5 @@
 #include "IMU.h"
+#include "Control.h"
 
 _IMU Mahony;
 
@@ -7,7 +8,7 @@ _IMU Mahony;
 void Update_IMU_Data_Mahony(_IMU *IMU,MPU_SENSOR *sen)
 {
 	HAL_NVIC_DisableIRQ(DMA1_Stream2_IRQn);
-	Mpu_update(sen);
+	Mpu_update(sen);   //Alireza: update gyro & acc & gravity
 	HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
 	update_Accel_weight(IMU,sen);
 	MahonyAHRSupdateIMU(IMU,sen);
@@ -29,23 +30,48 @@ void update_Accel_weight(_IMU *IMU,MPU_SENSOR *sen)
     sen->g_print=sen->last_g_print+(DT / ( FILTER_G_PRINT + DT)) * (sen->g_print-sen->last_g_print);                
               
     sen->last_g_print=sen->g_print;  
+	
+																	if ( Yaw.flag == 0 ){    // moj
 
-    if(sen->g_print < 0.007f)
-              IMU->Accel_weight=1.2f;  
-    else if(sen->g_print < 0.010f)
-              IMU->Accel_weight=0.8f;          
-    else if(sen->g_print < 0.017f)
-              IMU->Accel_weight=0.25f; 
-    else if(sen->g_print < 0.021f)
-              IMU->Accel_weight=0.05f; 
-    else if(sen->g_print < 0.024f)
-              IMU->Accel_weight=0.005f; 
-    else if(sen->g_print < 0.5f)
-              IMU->Accel_weight=0.00005f;      
-    else if(sen->g_print < 0.6f)
-              IMU->Accel_weight=0.000001f;
-    else
-              IMU->Accel_weight=0.0000001f;  
+
+																	if(sen->g_print < 0.016f)
+																						IMU->Accel_weight=1.2f;  
+																	else if(sen->g_print < 0.019f)
+																						IMU->Accel_weight=0.8f;          
+																	else if(sen->g_print < 0.027f)
+																						IMU->Accel_weight=0.25f; 
+																	else if(sen->g_print < 0.029f)
+																						IMU->Accel_weight=0.05f; 
+																	else if(sen->g_print < 0.031f)
+																						IMU->Accel_weight=0.005f; 
+																	else if(sen->g_print < 0.5f)
+																						IMU->Accel_weight=0.00005f;      
+																	else if(sen->g_print < 0.6f)
+																						IMU->Accel_weight=0.000001f;
+																	else
+																						IMU->Accel_weight=0.0000001f;
+																}		
+	if (Yaw.flag == 1){         // moj
+		
+																			if(sen->g_print < 0.006f)
+																								IMU->Accel_weight=1.2f;  
+																			else if(sen->g_print < 0.009f)
+																								IMU->Accel_weight=0.8f;          
+																			else if(sen->g_print < 0.014f)
+																								IMU->Accel_weight=0.25f; 
+																			else if(sen->g_print < 0.018f)
+																								IMU->Accel_weight=0.05f; 
+																			else if(sen->g_print < 0.021f)
+																								IMU->Accel_weight=0.005f; 
+																			else if(sen->g_print < 0.023f)
+																								IMU->Accel_weight=0.00005f;      
+																			else if(sen->g_print < 0.026f)
+																								IMU->Accel_weight=0.000001f;
+																			else
+																								IMU->Accel_weight=0.0000001f;  
+																		} 
+																	
+
               
 }
 
@@ -68,8 +94,8 @@ void Update_Euler_angles(_IMU *IMU,MPU_SENSOR *sen)
 		  IMU->Twokp_Y++; 
           
 
-		
 		IMU->last_Yaw   = IMU->Yaw;
+		
 		
 		IMU->Yaw = 360*IMU->Twokp_Y + IMU->Yaw;
 		IMU->last_Roll  = IMU->Roll;
@@ -116,7 +142,6 @@ void Calculate_Static_Acc(_IMU *IMU,MPU_SENSOR *sen)
 
 void MahonyAHRSupdateIMU(_IMU *IMU,MPU_SENSOR *sen)
 {
-	
 		float recipNorm;
 		float halfvx, halfvy, halfvz;
 		float halfex, halfey, halfez;
@@ -136,51 +161,51 @@ void MahonyAHRSupdateIMU(_IMU *IMU,MPU_SENSOR *sen)
 		float ay = sen->acc_y/sen->Gravity;
 		float az = sen->acc_z/sen->Gravity;
 	
-		// Compute feedback only if accelerometer measurement valid (avoids NaN in accelerometer normalisation)
+		
 		if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) 
 		{
 
-						// Normalise accelerometer measurement
+
 						recipNorm = invSqrt(ax * ax + ay * ay + az * az);
 						ax *= recipNorm;
 						ay *= recipNorm;
 						az *= recipNorm;        
 
-						// Estimated direction of gravity and vector perpendicular to magnetic flux
+
 						halfvx = q1 * q3 - q0 * q2;
 						halfvy = q0 * q1 + q2 * q3;
 						halfvz = q0 * q0 - 0.5f + q3 * q3;
 		
-						// Error is sum of cross product between estimated and measured direction of gravity
+
 						halfex = (ay * halfvz - az * halfvy);
 						halfey = (az * halfvx - ax * halfvz);
 						halfez = (ax * halfvy - ay * halfvx);
 
-						// Compute and apply integral feedback if enabled
+
 						if(Mahony_twoKiDef > 0.0f) {
-										IMU->integralFBx += Mahony_twoKiDef * halfex * (1.0f / sampleFreq);    // integral error scaled by Ki
-										IMU->integralFBy += Mahony_twoKiDef * halfey * (1.0f / sampleFreq);
-										IMU->integralFBz += Mahony_twoKiDef * halfez * (1.0f / sampleFreq);
-										gx += IMU->integralFBx;      // apply integral feedback
+										IMU->integralFBx += Mahony_twoKiDef * halfex * (1.0f / 250.0f);    
+										IMU->integralFBy += Mahony_twoKiDef * halfey * (1.0f / 250.0f);
+										IMU->integralFBz += Mahony_twoKiDef * halfez * (1.0f / 250.0f);
+										gx += IMU->integralFBx;      
 										gy += IMU->integralFBy;
 										gz += IMU->integralFBz;
 						}
 						else {
-										IMU->integralFBx = 0.0f;     // prevent integral windup
+										IMU->integralFBx = 0.0f;     
 										IMU->integralFBy = 0.0f;
 										IMU->integralFBz = 0.0f;
 						}
 
-						// Apply proportional feedback
+
 						gx += IMU->Accel_weight * Mahony_twoKpDef * halfex;
 						gy += IMU->Accel_weight * Mahony_twoKpDef * halfey;
 						gz += IMU->Accel_weight * Mahony_twoKpDef * halfez;
 		}
 		
-		// Integrate rate of change of quaternion
-		gx *= (0.5f * (1.0f / sampleFreq));             // pre-multiply common factors
-		gy *= (0.5f * (1.0f / sampleFreq));
-		gz *= (0.5f * (1.0f / sampleFreq));
+
+		gx *= (0.5f * (1.0f / 256.0f));             
+		gy *= (0.5f * (1.0f / 256.0f));
+		gz *= (0.5f * (1.0f / 256.0f));
 		qa = q0;
 		qb = q1;
 		qc = q2;
@@ -189,7 +214,7 @@ void MahonyAHRSupdateIMU(_IMU *IMU,MPU_SENSOR *sen)
 		q2 += (qa * gy - qb * gz + q3 * gx);
 		q3 += (qa * gz + qb * gy - qc * gx); 
 		
-		// Normalise quaternion
+
 		recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
 		q0 *= recipNorm;
 		q1 *= recipNorm;
@@ -201,9 +226,11 @@ void MahonyAHRSupdateIMU(_IMU *IMU,MPU_SENSOR *sen)
 		IMU->q1 = q1;
 		IMU->q2 = q2;
 		IMU->q3 = q3;
+  }
 
 
-}
+
+
 
 
 

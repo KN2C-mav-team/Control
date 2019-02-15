@@ -1,3 +1,4 @@
+#include "main.h"
 #include "NRF.h"
 #include "Control.h"
 
@@ -111,15 +112,31 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 				 break;
 			case '3':
 				 print__[Yaw_Gain]=(print__[Yaw_Gain]==0) ? 1:0;
-				 break;
-			case '4':
-				 print__[Altitude_Gain]=(print__[Altitude_Gain]==0) ? 1:0;
-				 break;			
+				 break;		
 			case '5':
 				 print__[Altitude_Velocity_Gain]=(print__[Altitude_Velocity_Gain]==0) ? 1:0;
 				 break;	
-			case '`':
-				 print__[Position_Gain]=(print__[Position_Gain]==0) ? 1:0;
+			case '=':
+				 print__[ORB_position_Gain]=(print__[ORB_position_Gain]==0) ? 1:0;
+				 break;	
+			case ']':
+				 print__[opti_x_read]=(print__[opti_x_read]==0) ? 1:0;
+				 break;	
+			case '[':
+				 print__[opti_y_read]=(print__[opti_y_read]==0) ? 1:0;
+				 break;	
+			case '<':
+				 print__[Altitude_take_off_Gain]=(print__[Altitude_take_off_Gain]==0) ? 1:0;
+				 break;	
+			case '>':
+				 print__[Altitude_take_off_Gain_set]=(print__[Altitude_take_off_Gain_set]==0) ? 1:0;
+			 if(print__[Altitude_take_off_Gain_set] == 0)
+					{
+						data[0] = (int)(Altitude_take_off_P_coefficient * (RC.HOV_THR*10)) ;
+						data[1] = (int)(Altitude_take_off_I_coefficient * (RC.RC_TRIM*10)) ;
+						data[2] = (int)(Altitude_take_off_D_coefficient * (RC.HOV_PIT*10)) ;
+						Set_Gain(_Altitude_take_off_gain,data);
+					}				
 				 break;	
 			
 			
@@ -151,38 +168,48 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 						data[1] = (int)(Yaw_I_coefficient * (RC.RC_TRIM*10)) ;
 						data[2] = (int)(Yaw_D_coefficient * (RC.HOV_PIT*10)) ;
 						Set_Gain(_Yaw_Gain,data);
-					}							  
-				 break;
-			case '$':
-				 print__[Altitude_Gain_set]=(print__[Altitude_Gain_set]==0) ? 1:0;									
-				 if(print__[Altitude_Gain_set] == 0)
-					{
-						data[0] = (int)(Altitude_P_coefficient * (RC.HOV_THR*10)) ;
-						data[1] = (int)(Altitude_I_coefficient * ((0.5+(RC.Roll/angle_range))*10)) ;   //**//**//
-						data[2] = (int)(Altitude_D_coefficient * (RC.HOV_PIT*10)) ;
-						Set_Gain(_Altitude_Gain,data);
-					}				 
+					}							  			 
 				 break;	
 			case '%':
 				 print__[Altitude_Velocity_Gain_set]=(print__[Altitude_Velocity_Gain_set]==0) ? 1:0;									
 				 if(print__[Altitude_Velocity_Gain_set] == 0)
 					{
 						data[0] = (int)(Altitude_Velocity_P_coefficient * (RC.HOV_THR*10)) ;
-						data[1] = (int)(Altitude_Velocity_I_coefficient * (RC.RC_TRIM*10)) ;
-						data[2] = (int)(Altitude_Velocity_D_coefficient * (RC.HOV_PIT*10)) ;
+						data[1] = (int)(Altitude_Velocity_I_coefficient * (RC.HOV_PIT*10)) ;
+						data[2] = (int)(Altitude_Velocity_D_coefficient * (RC.RC_TRIM*10)) ;
 						Set_Gain(_Altitude_Velocity_Gain,data);
 					}				 
 				 break;	
-			case '~':
-				 print__[Position_Gain_set]=(print__[Position_Gain_set]==0) ? 1:0;									
-				 if(print__[Position_Gain_set] == 0)
+			case '+':
+				 print__[ORB_position_Gain_set]=(print__[ORB_position_Gain_set]==0) ? 1:0;									
+				 if(print__[ORB_position_Gain_set] == 0)
 					{
-						data[0] = (int)(Position_P_coefficient * (RC.HOV_THR*100)) ;
-						data[1] = (int)(Position_I_coefficient * (RC.RC_TRIM*100)) ;	////****////
-						data[2] = (int)(Position_D_coefficient * (RC.HOV_PIT*100)) ;
-						Set_Gain(_Position_Gain,data);
+						data[0] = (int)(ORB_position_P_coefficient * (RC.HOV_THR*1000)) ;
+						data[1] = (int)(ORB_position_I_coefficient * (RC.RC_TRIM*1000)) ;	////****////
+						data[2] = (int)(ORB_position_D_coefficient * (RC.HOV_PIT*1000)) ;
+						Set_Gain(_ORB_position_Gain,data);
 					}				 
-				 break;	
+				 break;
+			case '}':	
+				 print__[opti_x_set]=(print__[opti_x_set]==0) ? 1:0;									
+				 if(print__[opti_x_set] == 0)
+					{
+						data[0] = (int)(opti_x_P_coefficient * (RC.HOV_THR*1000)) ;
+						data[1] = (int)(opti_x_I_coefficient * (RC.RC_TRIM*1000)) ;
+						data[2] = (int)(opti_x_D_coefficient * (RC.HOV_PIT*1000)) ;
+						Set_Gain(_opti_x_gain,data);
+					}							  
+				 break;
+			case '{':	
+				 print__[opti_y_set]=(print__[opti_y_set]==0) ? 1:0;									
+				 if(print__[opti_y_set] == 0)
+					{
+						data[0] = (int)(opti_y_P_coefficient * (RC.HOV_THR*1000)) ;
+						data[1] = (int)(opti_y_I_coefficient * (RC.RC_TRIM*1000)) ;
+						data[2] = (int)(opti_y_D_coefficient * (RC.HOV_PIT*1000)) ;
+						Set_Gain(_opti_y_gain,data);
+					}							  
+				 break;
 					
 			case 'b':
 				 print__[BAT]=(print__[BAT]==0) ? 1:0;
@@ -196,10 +223,7 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 				 break;
 			case '8':
 				 print__[Yaw_Control_signal]=(print__[Yaw_Control_signal]==0) ? 1:0;
-				 break;
-			case '7':
-				 print__[Altitude_Control_signal]=(print__[Altitude_Control_signal]==0) ? 1:0;
-				 break;				
+				 break;			
 			case '6':
 				 print__[Altitude_Velocity_Control_signal]=(print__[Altitude_Velocity_Control_signal]==0) ? 1:0;
 				 break;
@@ -209,9 +233,19 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 			case 'p':
 				 print__[PTAM_DATA]=(print__[PTAM_DATA]==0) ? 1:0;
 				 break;	
+			case 'o':
+				 print__[Optical_Flow]=(print__[Optical_Flow]==0) ? 1:0;
+				 break;	
 			case 's':
 					RC.init = 0;
-				 break;				
+				 break;
+			case 'q':
+				 print__[opti_y_signal]=(print__[opti_y_signal]==0) ? 1:0;
+				 break;
+			case 'w':
+				 print__[opti_x_signal]=(print__[opti_x_signal]==0) ? 1:0;
+				 break;
+					
 		}
 		
 		//***************************************************************
@@ -222,11 +256,11 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 			}
 		if(print__[GYRO]==1)	                       
 			{
-				NrF_Fill_Data(Nrf,3,(int)(Mpu.gyro_x),(int)(Mpu.gyro_y),(int)(Mpu.gyro_z));
+				NrF_Fill_Data(Nrf,3,(int)(ToDeg(Mpu.gyro_x)),(int)(ToDeg(Mpu.gyro_y)),(int)(ToDeg(Mpu.gyro_z)));
 			}
 		if(print__[GRAVITY]==1)	                       
 			{
-				NrF_Fill_Data(Nrf,3,(int)(Mpu.Gravity),(int)(Mpu.g_print*1000),(int)(Mahony.Accel_weight*100));
+				NrF_Fill_Data(Nrf,2,(int)(Mpu.acc_z),(int)(Mahony.Earth_acc_z*1000));
 			}
 		if(print__[Euler_angles]==1)	 
 			{
@@ -238,11 +272,15 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 			}
 		if(print__[RC_ATITUDE]==1)	 
 			{
-	 		    NrF_Fill_Data(Nrf,4,(int)RC.Throttle,(int)(RC.Roll),(int)(RC.Pitch),(int)(RC.Yaw));
+	 		    NrF_Fill_Data(Nrf,4,(int)RC.Throttle,(int)(RC.Roll*10),(int)(RC.Pitch*10),(int)(RC.Yaw*10));
+			}
+		if(print__[ms_detail]==1)	 
+			{
+	 		    NrF_Fill_Data(Nrf,1,(int)MS.P);
 			}
 		if(print__[Altitude_Detail]==1)	 
 			{
-	 		    NrF_Fill_Data(Nrf,3,(int)Ultra.real,(int)Ultra.point,(int)(Ultra_Z_Kalman.STATE[0][0]));
+	 		    NrF_Fill_Data(Nrf,1,(int)(Ultra.point));
 			}
 		if(print__[Roll_Gain]==1)	 
 			{
@@ -269,14 +307,6 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 //					data[2] = Yaw.Kd*10;	//Roll_D_coefficient * RC.HOV_PIT *10;
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}
-		if(print__[Altitude_Gain]==1)	 
-			{
-					Read_Gain(_Altitude_Gain,data);
-//					data[0] = Altitude.Kp*10;	//(Roll_P_coefficient * RC.HOV_THR *10);
-//					data[1] = Altitude.Ki*10;	//Roll_I_coefficient * RC.RC_TRIM *10;
-//					data[2] = Altitude.Kd*10;	//Roll_D_coefficient * RC.HOV_PIT *10;
-	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
-			}
    	if(print__[Altitude_Velocity_Gain]==1)	 
 			{
 					Read_Gain(_Altitude_Velocity_Gain,data);
@@ -285,12 +315,30 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 //					data[2] = Altitude_Velocity.Kd*10;	//Roll_D_coefficient * RC.HOV_PIT *10;
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}
-		if(print__[Position_Gain]==1)	 
+			
+		if(print__[ORB_position_Gain]==1)	 
 			{
-					Read_Gain(_Position_Gain,data);
+					Read_Gain(_ORB_position_Gain,data);
 //					data[0] = Position.X.Kp*10;		//(Roll_P_coefficient * RC.HOV_THR *10);
 //					data[1] = Position.X.Ki*10;		//Roll_I_coefficient * RC.RC_TRIM *10;
 //					data[2] = Position.X.Kd*10;		//Roll_D_coefficient * RC.HOV_PIT *10;
+	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
+			}
+
+		if(print__[opti_x_read]==1)	 
+			{
+					Read_Gain(_opti_x_gain,data);
+//					data[0] = Roll.Kp*10;//(Roll_P_coefficient * RC.HOV_THR *10);
+//					data[1] = Roll.Ki*10;//Roll_I_coefficient * RC.RC_TRIM *10;
+//					data[2] = Roll.Kd*10;//Roll_D_coefficient * RC.HOV_PIT *10;
+	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
+			}
+		if(print__[opti_y_read]==1)	 
+			{
+					Read_Gain(_opti_y_gain,data);
+//					data[0] = Roll.Kp*10;//(Roll_P_coefficient * RC.HOV_THR *10);
+//					data[1] = Roll.Ki*10;//Roll_I_coefficient * RC.RC_TRIM *10;
+//					data[2] = Roll.Kd*10;//Roll_D_coefficient * RC.HOV_PIT *10;
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}
 		if(print__[Roll_Gain_set]==1)	 
@@ -314,34 +362,43 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 					data[2] = (Yaw_D_coefficient * RC.HOV_PIT*10);
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}			
-		if(print__[Altitude_Gain_set]==1)	 
-			{
-					data[0] = (Altitude_P_coefficient * RC.HOV_THR*10);
-					data[1] = (int)(Altitude_I_coefficient * ((0.5+(RC.Roll/angle_range))*10)) ;  //**//**//
-					data[2] = (Altitude_D_coefficient * RC.HOV_PIT*10);
-	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
-			}			
 		if(print__[Altitude_Velocity_Gain_set]==1)	 
 			{
 					data[0] = (Altitude_Velocity_P_coefficient * RC.HOV_THR*10);
-					data[1] = (Altitude_Velocity_I_coefficient * RC.RC_TRIM*10);
-					data[2] = (Altitude_Velocity_D_coefficient * RC.HOV_PIT*10);
+					data[1] = (Altitude_Velocity_I_coefficient * RC.HOV_PIT*10);
+					data[2] = (Altitude_Velocity_D_coefficient * RC.RC_TRIM*10);
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}
-		if(print__[Position_Gain_set]==1)	 
+		if(print__[Altitude_take_off_Gain_set]==1)	 
 			{
-					data[0] = (Position_P_coefficient * RC.HOV_THR*100);
-					data[1] = (Position_I_coefficient * RC.RC_TRIM*100);   ////****////
-					data[2] = (Position_D_coefficient * RC.HOV_PIT*100);
+					data[0] = (Altitude_take_off_P_coefficient * RC.HOV_THR*10);
+					data[1] = (Altitude_take_off_I_coefficient * RC.RC_TRIM*10);
+					data[2] = (Altitude_take_off_D_coefficient * RC.HOV_PIT*10);
+	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
+			}
+		if(print__[Altitude_take_off_Gain]==1)	 
+			{
+					Read_Gain(_Altitude_take_off_gain,data);
+	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
+			}
+		if(print__[ORB_position_Gain_set]==1)	 
+			{
+					data[0] = (ORB_position_P_coefficient * RC.HOV_THR*1000);
+					data[1] = (ORB_position_I_coefficient * RC.RC_TRIM*1000);   ////****////
+					data[2] = (ORB_position_D_coefficient * RC.HOV_PIT*1000);
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}
 			
 		if(print__[Roll_Control_signal]==1)	 
 			{
-					data[0] = Roll.setpoint * 10;
-					data[1] = Roll.point * 10;
-				  data[2] = Roll.err * 10;
-				  data[3] = Roll.Out * 10;
+//					data[0] = Roll.setpoint * 10;
+//					data[1] = Roll.point * 10;
+//				  data[2] = Roll.err * 10;
+//				  data[3] = Roll.Out * 10;
+					data[0] = MRU;
+					data[1] = MLD;
+				  data[2] = MRD;
+				  data[3] = MLU;
 	 		    NrF_Fill_Data(Nrf,4,data[0],data[1],data[2],data[3]);
 			}
 		if(print__[Pitch_Control_signal]==1)	 
@@ -359,36 +416,53 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
 			}
 			
-		if(print__[Altitude_Control_signal]==1)	 
-			{
-					data[0] = Altitude.setpoint;   
-					data[1] = Altitude.point;
-				  data[2] = Ultra.point;				 				
-										
-	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
-			}
-			
 		if(print__[Altitude_Velocity_Control_signal]==1)	 		//**//
 			{
-					data[0] = Altitude_Velocity.setpoint;   
+					data[0] = Ultra.point;   
 					data[1] = Altitude_Velocity.point;
-				  //data[2] = Motor_force;
+				  data[2] = Altitude_Velocity.Out_float;
+			  	data[3] = Altitude_Velocity.P_save;
+			  	data[4] = Altitude_Velocity.I_save;
+					data[5] = Altitude_Velocity.D_save;
 										
-	 		    NrF_Fill_Data(Nrf,4,data[0],data[1],(int)(Mahony.pure_acc_z*100),(int)Ultra.vel);
+				 NrF_Fill_Data(Nrf,6,data[0],data[1],data[2],data[3],data[4],data[5]);
 			}
 
 		if(print__[Position_Control_signal]==1)	 		//**//
-			{
-					data[0] = Position.X.setpoint;   
-					data[1] = Position.X.point;
-					data[2] = Position.Y.setpoint;   
-					data[3] = Position.Y.point;
+			{  
+					data[0] = ORB_position.X.point; 
+					data[1] = ORB_position.Y.point;
+					data[2] = ORB_position.X.Out_float*100;   
+					data[3] = ORB_position.Y.Out_float*100;
 										
 	 		    NrF_Fill_Data(Nrf,4,data[0],data[1],data[2],data[3]);
-			}			
+			}
+		if(print__[opti_x_set]==1)	 
+			{
+					data[0] = (opti_x_P_coefficient * RC.HOV_THR*1000);
+					data[1] = (opti_x_I_coefficient * RC.RC_TRIM*1000);
+					data[2] = (opti_x_D_coefficient * RC.HOV_PIT*1000);
+	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
+			}		
+		if(print__[opti_y_set]==1)	 
+			{
+					data[0] = (opti_y_P_coefficient * RC.HOV_THR*1000);
+					data[1] = (opti_y_I_coefficient * RC.RC_TRIM*1000);
+					data[2] = (opti_y_D_coefficient * RC.HOV_PIT*1000);
+	 		    NrF_Fill_Data(Nrf,3,data[0],data[1],data[2]);
+			}	
+		if(print__[opti_x_signal]==1)	 
+			{
+	 		    NrF_Fill_Data(Nrf,6,(int)Roll.setpoint,(int)(Velocity.X.point * 10),(int)(Velocity.X.P_save* 100),(int)(Velocity.X.I_save* 100),(int)(Velocity.X.D_save* 100),(int)(10*Velocity.X.Out_float));
+					//NrF_Fill_Data(Nrf,6,(int)(Roll.setpoint*100),(int)(Velocity.X.P_save* 100),(int)(Velocity.X.I_save* 100),(int)(Pitch.setpoint*100),(int)(100*Velocity.Y.P_save),(int)(100*Velocity.Y.I_save));
+			}		
+		if(print__[opti_y_signal]==1)	 
+			{
+	 		    NrF_Fill_Data(Nrf,6,(int)Pitch.setpoint,(int)(10*Velocity.Y.point),(int)(100*Velocity.Y.P_save),(int)(100*Velocity.Y.I_save),(int)(100*Velocity.Y.D_save),(int)(10*Velocity.Y.Out_float));
+			}				
 		if(print__[BAT]==1)	 
 			{
-				  NrF_Fill_Data(Nrf,1,(int)(Bat_/21.6));
+				  NrF_Fill_Data(Nrf,1,(int)(10*(float)(Bat_/1.0f)));
 			}
 		if(print__[Vel_Z]==1)	 
 			{
@@ -400,7 +474,23 @@ void Nrf_Tele(NRF_BOARD* Nrf)
 			}
 		if(print__[PTAM_DATA]==1)	 
 			{
-				  NrF_Fill_Data(Nrf,5,(int)(10*Position.X.P_save),(int)(10*Position.X.I_save),(int)(10*Position.X.D_save),(int)(10*Position.X.Out_float),(int)Cam_Position.Modified_POS_Z);
+				 // NrF_Fill_Data(Nrf,5,(int)(10*Position.X.P_save),(int)(10*Position.X.I_save),(int)(10*Position.X.D_save),(int)(10*Position.X.Out_float),(int)Cam_Position.Modified_POS_Z);
 			}
+			if(print__[Optical_Flow]==1)	 
+			{
+				  //NrF_Fill_Data(Nrf,4,(int)(10*optical.Vel_X),(int)Ultra.point,(int)(optical.Gyro_X *10),(int)(optical.Gyro_X *10 - 10*optical.Vel_X));
+				//	NrF_Fill_Data(Nrf,3,(int)(10*optical.Vel_),(int)(optical.Gyro_Y),(int)(optical.Gyro_X));
+					//NrF_Fill_Data(Nrf,4,(int)(10*(optical.Vel_X)),(int)(10*(optical.Vel_X - (optical.Gyro_X/3))),(int)(10*(optical.Vel_Y)),(int)(10*(optical.Vel_Y - (optical.Gyro_Y/(-3)))));	
+				  //NrF_Fill_Data(Nrf,6,(int)((optical.Vel_X)),(int)((optical.Vel_Y)),(int)((optical.Gyro_X)),(int)(optical.Gyro_Y),(int)optical.Vel_correction_X,(int)optical.Vel_correction_Y);	
+					//NrF_Fill_Data(Nrf,2,(int)optical.Vel_correction_Y,(int)optical.Vel_Y);
+					//NrF_Fill_Data(Nrf,4,(int)x_vel.state,(int)y_vel.state,(int)optical.real_Vel_X,(int)optical.real_Vel_Y);
+				
+		//		NrF_Fill_Data(Nrf,2,(int)(x_vel.state ),(int)(y_vel.state));
+			//	NrF_Fill_Data(Nrf,4,(int)(x_vel.state * 10),(int)(y_vel.state* 10),(int)(optical.max_acc_x*10),(int)(optical.max_acc_y*10));
+					//NrF_Fill_Data(Nrf,2,(int)y_vel.state,(int)optical.real_Vel_Y);
+				
+					//NrF_Fill_Data(Nrf,2,(int)y_vel.state,(int)optical.Vel_correction_Y);
+			}
+	
 	
 }

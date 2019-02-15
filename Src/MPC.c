@@ -1,7 +1,11 @@
+
+#include "main.h"
 #include "MPC.h"
 
-_MPC MPC;
+int moj_interupt_usart_rc=0;
 
+_MPC MPC;
+_MPC MPC_2;
 
 void Mpc_decode(_MPC* Mpc,uint8_t data)
 {
@@ -116,20 +120,35 @@ void Mpc_Send_Data(_MPC* Mpc)
 
 
 
-void Check_MPC_IRQ(_MPC* Mpc)
+void Check_MPC_IRQ(_MPC* Mpc,_MPC* Mpc_2)
 {
 	if(Mpc->UART_IRQ_FLAG)
 		{
-			if(!Mpc->ready)
+						if(!Mpc->ready)
 			{
 				int co = 0;
 				for(co=0;co<MPC_BUFF_AMOUNT;co++)
 				{
-					Mpc_decode(Mpc,Mpc->MPC_UART_BUFF[co]);
+					// decode_mavlink_packet(Mpc->MPC_UART_BUFF[co],Mpc);	
+           Mpc_decode(Mpc,Mpc->MPC_UART_BUFF[co]);					
 				}
-				
 			}
-			Mpc->UART_IRQ_FLAG = 0;
+			  Mpc->UART_IRQ_FLAG = 0;
+			
+		}
+	 if(Mpc_2->UART_IRQ_FLAG)
+		{		
+				//	if(!Mpc_2->ready)
+			//{
+				int co = 0;
+				for(co=0;co<MPC_BUFF_AMOUNT_2;co++)
+				{
+						moj_interupt_usart_rc++;	
+					 //decode_mavlink_packet_2(Mpc->MPC_UART_BUFF_2[co],Mpc);		
+            Mpc_decode(Mpc_2,Mpc_2->MPC_UART_BUFF_2[co]);					
+			}	
+		//}				
+			  Mpc_2->UART_IRQ_FLAG = 0;
 		}
 }
 

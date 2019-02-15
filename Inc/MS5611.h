@@ -24,7 +24,7 @@
 
 
 //                   filter
-#define	F_CUT_P			   			4
+#define	F_CUT_P			   			2.5
 #define FILTER_P          1/(2*PI*F_CUT_P		      	)
 
 #define	F_CUT_D		   			  0.5 											//**//
@@ -36,12 +36,13 @@ typedef struct {
 	int coefficient[7];
 	int D1,D2;
 	int last_D1,last_D2;
-	uint64_t dt;
+	uint32_t dt;
 	char station;
 	long int TEMP;
 	long int OFF;
 	long int SENS;
-	long int P;
+	long int P,real_p,P_average,last_P_average;
+	long int P_kalman,xk;
 	float P0;
 	float T0;
 	long int last_P;

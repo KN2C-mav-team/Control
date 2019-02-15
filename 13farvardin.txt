@@ -1,0 +1,156 @@
+optical :222,37,25,
+orb :149,101,112
+vaziat : 30 cm jolo setpoint dade shod va over shoot ziad bud ,ta 100
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+of :ghabli
+orb:524,37,431,
+vaziat: over shoot kamtar shode bud ama hole setpoint khub vaynmistad
+////////////////////////////////////////////////////////////////////
+of :222,0,25
+orb:524,37,431
+kheyli ghavi bud zarayeb va bad bud asan jam nmmikard va napaydar mishod
+?////////////////////////////////////////////////////////////////////
+optical check shod :
+kheyli sabok bud 
+chon i nadasht kheyli drift mikhord
+ba hamun zarayeb e ghabli 
+////////////////////////////////////////////////
+optical :
+291,101,202,305,37,238,
+k i tu barname sefr shode
+kheyli navasab bud va ziad budan zarayeb 
+//////////////////////////////////////
+optical:
+261,37,104,261,37,98,
+i hamchonan sefre :
+baz ham navasani ama kamtar fek konam zarayebo kamtar konam hal beshe 
+///////////////////////////////////////////////////////////
+198,37,64,194,37,66, optical
+i =0;
+baz ham navasani amma kamtar az ghabl baz ham bayad kamtaresh konam 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+optical :
+195,37,36,204,37,38,  (***)
+i=0;
+khub bud va bekhatre nadashtan i drift dasht mikham yekami bishtar konm bbinm chi mishe , mikham d ro bbaram bala
+na na , ye bar d ro bala mibaram y bar p
+/////////////////////////////////////////////////////
+oprtical :
+197,37,55,195,37,56,
+navasani
+d ro barmigardunm b ghabl p ro bala mibaram 
+///////////////////////////////////////////////////////
+optical :
+219,37,35,214,37,32,
+khub bud , az halate (***) behtar bud mikham p ro bbaram balatar
+///////////////////////////////////////////////////////
+optical :
+250,37,33,245,37,35,
+
+************"THE BEST"*************
+optical :
+250,37,33,245,37,35,
+orb:524,37,431,
+taghriban khub bud ama dir miraft va navasan yekami over shoot dasht setpoint bozorg fek konm behtare;
+***yadam bashe k zarayebo vaghti kamtar az 20 cm error bud kam konm bara orb  va dar halate koli zarayeb gonde bashan***
+////////////////////////////////////////////
+optical :
+250,37,33,245,37,35,
+orb :
+612,37,507,
+set pointahye ziad khub bud ama setpointb kam na , pas gain orb ro ziad mikonim 
+////////////////////////////////
+orb : 1070,101,803
+optical :250,37,33,245,37,35,
+setpointe aval khub bud ama setpointe dovom bad shod mikham bbinm bazeye zarayeb fazy ro ok konm rewal mishe ya na
+/////////////////////////////////
+orb : 1070,101,803
+optical :250,37,33,245,37,35,
+2bare hamuna bud ama setpointaye bozorg khub bud , ba mohamad sohbat shod : d ziade va nmizare 
+////////////////////////////////////////
+optical :250,37,33,245,37,35,
+orb :954,12,437,
+khub shod ama setpointe ziad k miad nmitune jam kone va bayad shart bezaram k age error az ye hadi bishtar bud error sabet bemune 
+//////////////////////////////////
+umadam goftam age errore orb bishtar az 150 bud hamun 150 bemune 
+ye nokte inke tu mamsir robot hey tormoz mikone , va in D e , ama D e optikal ya ORB alan D e ORB ro kam mikonm 
+/////////////////////////////////
+orb :878,37,344,
+optical :ghabli
+behtar bud dg un tormoza nabud ama baz ham mikham kam knm
+////////////////
+orb : 878,37,262,
+optical :ghabli
+khub bud hala bayad D ro tu error haye ziad kam konam 
+////////////////////////////////////////////
+d ro tu error haye ziad kam kardam khub nabud
+//////////////////////////////////////////////////
+umadam eshba ro kam kardam az 40 be 20 khub nabud mikham zarayeb ro ziad konam 
+////////////////////////////////////////////////////
+991,37,404, orb 
+optical bedune taghir
+khub miraft ama over shoot dasht
+ya zarayeb ro kam konam ya fazy , aval zarayeb o kam mikonam 
+ye sooti dadam inke faghat umade budam D e rastaye Y ro tu error haye ziad kam kardam X ro kam nakardam fek knm dalile inke tu rastaye x badtar bud va over shoot dasht hamin bud
+
+/////////////////////////////////////////
+orb :943,37,361
+khub nmiraft albate scale  ham khub nabud mikham zarayeb ro bargardunam b halate ghabl 
+/////////////////////////////////
+985,37,406, orb 
+fek konam kheyli kuchik mikonm D ro 
+///////////////////////////////////
+985,37,406,
+tormoz mikone 
+mikham D ro kam konm 
+///////////////////////////
+orb 993,50,266,
+kamtar toormoz mikard
+////////////////////////
+kheyli taghir nkrd 
+mikham D ro kheyli kam konm 
+////////////////////
+orb :973,50,30,
+ru 100 tormoz kard 
+////////////////////
+orb : 795,37,365,
+/////////////////
+14FARVAE=RDIN
+mikham eshba ro ziad konam az 20 be 35 
+yadam bashe ye bar eshbae d ro faghat bara orb kam konam
+///////////////////////////
+	 if(fabs(ORB_position.X.point- ORB_position.X.setpoint )<15 ){   //15 khub 
+		 ORB_position.X.Kp=ORB_position.X.Kp_save*0.8f;
+		 ORB_position.X.Ki=ORB_position.X.Ki_save;
+		 ORB_position.X.Kd=ORB_position.X.Kd_save*0.7f;
+	 }
+//	 if(fabs(ORB_position.X.point- ORB_position.X.setpoint )<5 ){
+//		 ORB_position.X.Kp=ORB_position.X.Kp_save*0.4f;
+//		 ORB_position.X.Ki=ORB_position.X.Ki_save;
+//		 ORB_position.X.Kd=ORB_position.X.Kd_save*0.4f;
+//	 }
+	 if(fabs(ORB_position.X.point- ORB_position.X.setpoint )> 15 ){
+		 ORB_position.X.Kp=ORB_position.X.Kp_save*2.55f;   // 2.5
+		 ORB_position.X.Ki=ORB_position.X.Ki_save;
+		 ORB_position.X.Kd=ORB_position.X.Kd_save*0.375f;     //0.4
+	 }
+	if(fabs(ORB_position.Y.point- ORB_position.Y.setpoint )<15 ){
+		 ORB_position.Y.Kp=ORB_position.Y.Kp_save*0.8f;
+		 ORB_position.Y.Ki=ORB_position.Y.Ki_save;
+		 ORB_position.Y.Kd=ORB_position.Y.Kd_save*0.7f;
+	 }
+//		if(fabs(ORB_position.Y.point- ORB_position.Y.setpoint )<5 ){
+//		 ORB_position.Y.Kp=ORB_position.Y.Kp_save*0.4f;
+//		 ORB_position.Y.Ki=ORB_position.Y.Ki_save;
+//		 ORB_position.Y.Kd=ORB_position.Y.Kd_save*0.4f;
+//	 }	 
+	 if(fabs(ORB_position.Y.point- ORB_position.Y.setpoint )> 15 ){
+		 ORB_position.Y.Kp=ORB_position.Y.Kp_save*2.5f;
+		 ORB_position.Y.Ki=ORB_position.Y.Ki_save;
+		 ORB_position.Y.Kd=ORB_position.Y.Kd_save*0.375f;
+	 }
+///////////////////////////mik
+
+
+mikham i bedam be optical :
+

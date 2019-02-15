@@ -1,9 +1,13 @@
+#include "main.h"
 #include "MS5611.h"
 
 
 MS5611 MS;
-
-
+float P_sum=0,i=0;
+float pk=1.0;
+int r=5;   ///5
+float q=0.05;  //0.05
+float Kk=0;
 
 
 
@@ -16,6 +20,7 @@ void MS5611_Read_Prom(MS5611 *sen)
 		
 		HAL_I2C_Mem_Read(&sen->I2C,ms5607_ADD,ms5607_CMD_PROM_RD + i*2,1,(uint8_t *)&data,2,1000);
 		sen->coefficient[i] = data[0] * 256 + data[1];
+		HAL_Delay(60);
 
 	}
 }
@@ -56,12 +61,12 @@ void MS5611_calib(MS5611 *sen)
 			HAL_I2C_Mem_Write(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_4096 + ms5607_CMD_ADC_D1,1,(uint8_t *)data,1,1000);
 			HAL_Delay(10);
 			HAL_I2C_Mem_Read(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_READ,1,(uint8_t *)data,3,1000);
-			sen->D1 = data[0]*256*256 + data[1]*256+data[0];
+			sen->D1 = data[0]*256*256 + data[1]*256+data[2];
 			
 			HAL_I2C_Mem_Write(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_4096 + ms5607_CMD_ADC_D2,1,(uint8_t *)data,1,1000);
 			HAL_Delay(10);
 			HAL_I2C_Mem_Read(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_READ,1,(uint8_t *)data,3,1000);
-			sen->D2 = data[0]*256*256 + data[1]*256+data[0];
+			sen->D2 = data[0]*256*256 + data[1]*256+data[2];
 			
 			MS5611_calcute(sen);
 			//print2pc("%d\r",(int)sen->P);
@@ -101,7 +106,7 @@ void MS5611_Read(MS5611 *sen)
 			break;
 		case 3:
 			HAL_I2C_Mem_Read(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_READ,1,(uint8_t *)data,3,1000);
-			sen->D1 = data[0]*256*256 + data[1]*256+data[0];
+			sen->D1 = data[0]*256*256 + data[1]*256+data[2];
 			HAL_I2C_Mem_Write(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_4096 + ms5607_CMD_ADC_D2,1,(uint8_t *)data,1,1000);
 			sen->station+=1;
 			break;
@@ -116,10 +121,19 @@ void MS5611_Read(MS5611 *sen)
 		
 		case 6:
 			HAL_I2C_Mem_Read(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_READ,1,(uint8_t *)data,3,1000);
-			sen->D2 = data[0]*256*256 + data[1]*256+data[0];
+			sen->D2 = data[0]*256*256 + data[1]*256+data[2];
 			MS5611_calcute(sen);
-			sen->P=sen->last_P+ (DT / ( FILTER_P + DT)) * (sen->P - sen->last_P);
-			sen->last_P =sen->P;
+		   sen->real_p = sen->P;
+		   P_sum =P_sum + sen->P;
+		   i++;
+		   if(i>=1000){
+                 sen->P_average=P_sum/1000;
+                 i=0;
+				         P_sum=0;
+		          	 }				 
+		  sen->P=sen->last_P+ ((6*DT) / ( FILTER_P + (6*DT))) * (sen->P- sen->last_P);
+  		sen->last_P=sen->P;
+
 			HAL_I2C_Mem_Write(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_4096 + ms5607_CMD_ADC_D1,1,(uint8_t *)data,1,1000);
 			MS5611_2_Height(sen);
 			sen->station = 1;
@@ -130,6 +144,11 @@ void MS5611_Read(MS5611 *sen)
 			sen->station = 0;
 			break;
 	}
+		  pk=pk + q;
+			Kk=pk/(pk+r) ;
+			sen->xk = sen->xk +(Kk * (sen->P - sen->xk));
+			pk = (1-Kk)*pk;
+			sen->P_kalman=sen->xk;
 	
 }
 

@@ -1,6 +1,7 @@
 #include "Kalman.h"
 
 _Kalman1x1 z_vel;
+_Kalman1x1 orb_pos;
 
 //Multiply two n*m * m*k matrixs. This function developed by Omid
 void Any_Matrix_Multiply(int n,int m,int k,float *A, float *B,float *C)

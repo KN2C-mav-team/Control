@@ -34,6 +34,7 @@
 "1 configuration\rc.o"
 "1 configuration\telemetri.o"
 "1 configuration\odometery.o"
+"1 configuration\par_optical.o"
 "1 configuration\system_stm32f4xx.o"
 --library_type=microlib --strict --scatter "1 Configuration\1 Configuration.sct"
 

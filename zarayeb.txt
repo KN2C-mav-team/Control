@@ -1,0 +1,10 @@
+roll  :23 0 8
+pitch:23 0 8
+yaw: 17 0 6
+
+
+vel_altitude: 5 5 0
+
+
+
+p i d optical : 0.5 1.11 0

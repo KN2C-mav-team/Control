@@ -43,17 +43,20 @@ typedef struct {
 	float C;
 	
 	float state;
-	
+	float last_state;
+	float acc_kalman_output;
 	float Ex;
 	float Ez;
 	
 	float P;
 	float K;
+	int need_2_res;
 	
 }_Kalman1x1;
 
 
 extern _Kalman1x1 z_vel;
+extern _Kalman1x1 orb_pos;
 void Any_Matrix_Multiply(int n,int m,int k,float *A, float *B,float *C);
 void Matrix_Tranpose(int n,int m,float* src,float* dst);
 void Update_Kalman2x2(_Kalman2x2 *Kalman_state,float Ez,float Ex);

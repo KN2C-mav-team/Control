@@ -1,11 +1,14 @@
+#include "main.h"
 #include "Altitude.h"
 #include "IMU.h"
 #include "Odometery.h"
 #include "Kalman.h"
 
+
 _Ultra Ultra;
 float vel_z;
 int start_vel_z_kalman =0;
+int counter_loop=0;
 
 
 
@@ -51,7 +54,9 @@ void Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra)
 	}	
 	if(counter>200 | start_vel_z_kalman == 1)
 	{
+		
 		Vel_z(&z_vel,ultra,0);			//** For Control Z Position Disable this
+
 		start_vel_z_kalman=1;
 	}
 	if(ultra->State == 3)
@@ -88,64 +93,63 @@ void Ultra_Kalman_init(void)
 void  ultra_filter_lpf(_Ultra* ultra)
 {
 	float filter,f_cut;
-  // (6,100) (0.1,250)  
-	//ultra->lpf_Gain =ultra->vel;
-	ultra->lpf_Gain  = (ultra->real - ultra->last_point)/ultra->Diff_Time;
-
-	if(fabs(ultra->lpf_Gain) < 500)
-			f_cut=6;
-	else
-	{
-			f_cut = (800 - fabs(ultra->lpf_Gain))/84;
-			if(f_cut < 0.1f)
-				f_cut = 0.1f;
-	}
-	
+	f_cut=3;
 	filter =1/(2*3.14f*f_cut);			
 	ultra->point = ultra->last_point +(ultra->Diff_Time/(filter + ultra->Diff_Time))*(ultra->real-ultra->last_point);  
 	
-	ultra->last_diff = ultra->diff;				
-	ultra->diff =(float)(ultra->point - ultra->last_point)/ultra->Diff_Time; 
 	ultra->last_point= ultra->point;
 }
 
 float Vel_z(_Kalman1x1 *Kalman_state,_Ultra *ultra,float acc)
 {
+		
 	float ultra_noise=0;
 	float acc_z=Mahony.Earth_acc_z;
 	
-	if(Mahony.Earth_acc_z > 1)
-		acc_z =0;
+	  z_vel.last_state=z_vel.state;
+    ultra->K_point=ultra->point;
+  	ultra->K_point = ultra->K_last_point +(DT/(FILTER_Ultra + DT))*(ultra->K_point-ultra->K_last_point);  
+		
+		
+		ultra->vel = ((float)((ultra->K_point) - (ultra->K_last_point))/DT);
+		ultra->main_vel=ultra->vel;
+		ultra->vel= ultra->last_vel + ( DT /(DT + FILTER_VEL_lpf )*(ultra->vel - ultra->last_vel));
+	  ultra->vel_hpf=(FILTER_VEL_hpf/(FILTER_VEL_hpf + DT) )*(ultra->vel - ultra->last_vel + ultra->last_vel_hpf) ;
+   // ultra->vel_hpf=ultra->last_vel_hpf  + ( ultra->Diff_Time /(ultra->Diff_Time + FILTER_hpf_VEL_lpf )*(ultra->vel_hpf - ultra->last_vel_hpf ));
+		
+		ultra->last_vel = ultra->vel;	
+		ultra->K_last_point= ultra->K_point;	
+	  ultra->last_vel_hpf = ultra->vel_hpf ;
 	
-	if(ultra->ready == 2)
-	{
-		ultra->ready = 0;	
-		
-		ultra->K_point = ultra->K_last_point +(ultra->Diff_Time/(FILTER_Ultra + ultra->Diff_Time))*(ultra->real-ultra->K_last_point);  
-		ultra->vel = ((float)((ultra->K_point) - (ultra->K_last_point))/ultra->Diff_Time);
-    ultra->K_last_point= ultra->K_point;
+			z_vel.state = acc_z * 0.4f;
 
-		if(fabs(ultra->last_vel - ultra->vel) <40)
-		{
-			ultra_noise=500;
-			Update_Kalman1x1(&z_vel,ultra->vel,acc_z,ultra_noise,3);			
+if(fabs( ultra->vel_hpf ) < 30)
+											{
+												
+												if(z_vel.need_2_res == 1)
+												{
+													z_vel.P =1;
+													z_vel.need_2_res = 0;
+												}
+												ultra_noise=30;
+												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);
+													
 
-		}
-		else if(fabs(ultra->last_vel - ultra->vel) <80)
-		{
-			ultra_noise=1500 + 3000*(ultra->vel/25);
-			Update_Kalman1x1(&z_vel,ultra->vel,acc_z,ultra_noise,3);			
-		}
-		else
-			z_vel.state = z_vel.state + acc_z * 0.4f;	
+											}											
+//											}
+//	else if( fabs( ultra->vel_hpf ) <25)
+//											{
+//												ultra_noise=60;
+//												z_vel.need_2_res = 1;
+//												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);		
+//												
+//											}
+												
+	//*********************************************************************
+												
+
 		
-		ultra->last_vel = ultra->vel;		
-	}
-	else
-	{
-		z_vel.state = z_vel.state + acc_z * 0.4f;
-	}	
+
 	return 1.0;
 }
-
 

@@ -1,68 +1,86 @@
+#include "main.h"
 #include "RC.h"
 #include "NRF.h"
 _RC RC;
-
-void RC_Read(_RC* Rc,int State)
-{
-	char data[20];
-	ch2int con;
-	
-	if(State%10 == 3)
-	{
-		data[19]=1;
-		if( HAL_I2C_Master_Transmit(&Rc->I2C,30,(uint8_t*)&data[19],1,1) == HAL_OK)
-		{
-				HAL_I2C_Master_Receive(&Rc->I2C,30, (uint8_t *)&data[0],16,1);
-				for(int i=0;i<8;i++)
-					{
-						con.byte[0] = data[i*2];
-						con.byte[1] = data[i*2 + 1];
-						Rc->RC_channel[i] = con.real;
-					}
-				RC_2_SetPoint(Rc);
-				Rc->fail =0;
-		}	
-		else
-				Rc->fail =1;
-			
-	}
-	
-}
+_SBus SBUS;
+int moj_rc_flag=1;
 
 void RC_2_SetPoint(_RC* Rc)
 {	
+	char channel_err=0;
+	
 	if( ( Rc->RC_channel[Throttle_channel] > (Rc->channel_offset[Throttle_channel] - RC_noise) ) && ( (Rc->RC_channel[Throttle_channel]) < (Rc->channel_offset[Throttle_channel] + Rc->channel_scale[Throttle_channel] + RC_noise ) ) )
 				Rc->Throttle = Throttle_range*((float)(Rc->RC_channel[Throttle_channel]-Rc->channel_offset[Throttle_channel])/((float)Rc->channel_scale[Throttle_channel]));
+	else
+		channel_err+=1;
+	
 	
 	if( ( Rc->RC_channel[Roll_channel] > (Rc->channel_offset[Roll_channel]  - RC_noise) ) &&  ( (Rc->RC_channel[Roll_channel]) < (Rc->channel_offset[Roll_channel] + Rc->channel_scale[Roll_channel]+ RC_noise ) ) )
 		{
 				Rc->Roll=2*angle_range*(((float)(Rc->RC_channel[Roll_channel]-Rc->channel_offset[Roll_channel])/(float)Rc->channel_scale[Roll_channel])-0.5f);
 				Rc->Roll+=Roll_offset;                                                               
 		}
-				
+	else
+		channel_err+=1;	
+	
+	
 	if( ( Rc->RC_channel[Pitch_channel] > (Rc->channel_offset[Pitch_channel] - RC_noise)) && ( Rc->RC_channel[Pitch_channel] < (Rc->channel_offset[Pitch_channel] + Rc->channel_scale[Pitch_channel]+ RC_noise) ) )
 		{
 				Rc->Pitch= -2*angle_range*(((float)(Rc->RC_channel[Pitch_channel]-Rc->channel_offset[Pitch_channel])/(float)Rc->channel_scale[Pitch_channel])-0.5f);
 				Rc->Pitch+=Pitch_offset;                  
 		}
-				
+	else
+		channel_err+=1;	
+	
+	
 	if( (Rc->RC_channel[Yaw_channel] >Rc->channel_offset[Yaw_channel] - RC_noise) && (Rc->RC_channel[Yaw_channel] < Rc->channel_offset[Yaw_channel] + Rc->channel_scale[Yaw_channel]+ RC_noise))
         Rc->Yaw=angle_range*(((float)(Rc->RC_channel[Yaw_channel]-Rc->channel_offset[Yaw_channel])/(float)Rc->channel_scale[Yaw_channel])-0.5f);
+	else
+		channel_err+=1;
+	
 	
 //	if(Rc->RC_channel[HOV_PIT_channel] > Rc->channel_offset[HOV_PIT_channel]  - RC_noise && Rc->RC_channel[HOV_PIT_channel] < Rc->channel_offset[HOV_PIT_channel] + Rc->channel_scale[HOV_PIT_channel]+ RC_noise)    
 //				Rc->THR_CUT=(((float)(Rc->RC_channel[HOV_PIT_channel]-Rc->channel_offset[HOV_PIT_channel])/(float)Rc->channel_scale[HOV_PIT_channel]));       
 	
 	if(Rc->RC_channel[RC_SW_channel] > Rc->channel_offset[RC_SW_channel]  - RC_noise && Rc->RC_channel[RC_SW_channel] < Rc->channel_offset[RC_SW_channel] + Rc->channel_scale[RC_SW_channel]+ RC_noise)
 				Rc->RC_SW=(((float)(Rc->RC_channel[RC_SW_channel]-Rc->channel_offset[RC_SW_channel])/(float)Rc->channel_scale[RC_SW_channel]));
+	else
+		channel_err+=1;
+	
 	
 	if(Rc->RC_channel[HOV_THR_channel] > Rc->channel_offset[HOV_THR_channel]  - RC_noise && Rc->RC_channel[HOV_THR_channel] < Rc->channel_offset[HOV_THR_channel] + Rc->channel_scale[HOV_THR_channel]+ RC_noise)
 				Rc->HOV_THR=((float)(Rc->RC_channel[HOV_THR_channel]-Rc->channel_offset[HOV_THR_channel])/(float)Rc->channel_scale[HOV_THR_channel]);
+	else
+		channel_err+=1;
+	
 	
 	if(Rc->RC_channel[RC_TRIM_channel] > Rc->channel_offset[RC_TRIM_channel]  - RC_noise && Rc->RC_channel[RC_TRIM_channel] < Rc->channel_offset[RC_TRIM_channel] + Rc->channel_scale[RC_TRIM_channel]+ RC_noise)
 			  Rc->RC_TRIM=(((float)(Rc->RC_channel[RC_TRIM_channel]-Rc->channel_offset[RC_TRIM_channel])/(float)Rc->channel_scale[RC_TRIM_channel])); 
+	else
+		channel_err+=1;
+	
 	
 	if(Rc->RC_channel[HOV_PIT_channel] > Rc->channel_offset[HOV_PIT_channel]  - RC_noise && Rc->RC_channel[HOV_PIT_channel] < Rc->channel_offset[HOV_PIT_channel] + Rc->channel_scale[HOV_PIT_channel] + RC_noise)
 				Rc->HOV_PIT=((float)(Rc->RC_channel[HOV_PIT_channel]-Rc->channel_offset[HOV_PIT_channel])/(float)Rc->channel_scale[HOV_PIT_channel]);
+	else
+		channel_err+=1;
+	
+	
+	if(channel_err > 4)
+		Rc->Invalid_Data_counter += 1;
+	else
+		Rc->Invalid_Data_counter =  0;
+	
+	
+	
+	if(Rc->Invalid_Data_counter > 4)
+	{
+		Rc->fail = RC_Invalid_Data;
+		Rc->Invalid_Data_counter =5;
+	}
+	else
+		Rc->fail =  0;
+	
 	
 	
 	Rc->RC_SW   = (Rc->RC_SW> 0.5f )? 1 : 0;    
@@ -120,28 +138,15 @@ void RC_Calib(_RC* Rc,char calib)
 		HAL_Delay(1500);
 		while(Rc->init == 1)
 		{
-
-			data[19]=1;
-			if( HAL_I2C_Master_Transmit(&Rc->I2C,30,(uint8_t*)&data[19],1,1) == HAL_OK)
-			{
-					HAL_I2C_Master_Receive(&Rc->I2C,30, (uint8_t *)&data[0],16,1);
-					for(int i=0;i<8;i++)
-					{
-						con.byte[0] = data[i*2];
-						con.byte[1] = data[i*2 + 1];
-						Rc->RC_channel[i] = con.real;
-						
+			recieve_sbus_radio(&SBUS,&RC);
+			for(int i=0;i<8;i++)
+					{		
 						if(channel_max[i] < Rc->RC_channel[i])
 							channel_max[i] = Rc->RC_channel[i];
 						
 						if(channel_min[i] > Rc->RC_channel[i])
 							channel_min[i]  = Rc->RC_channel[i];
 					}		
-			}
-			print2pc("%d,%d,%d,%d,%d,%d,%d,%d\r",Rc->RC_channel[0],Rc->RC_channel[1],Rc->RC_channel[2],Rc->RC_channel[3],Rc->RC_channel[4],Rc->RC_channel[5],Rc->RC_channel[6],Rc->RC_channel[7]);
-			HAL_Delay(24);
-			Nrf_(&NRF,7);
-			LEDY_TGL;
 	  }
 		for(int i=0;i<8;i++)
 		{
@@ -200,9 +205,8 @@ void RC_Read_EEPROM(_RC* Rc)
 
 }	
 
-void RC_Init(_RC* Rc,I2C_HandleTypeDef hi2cx ,char calib)
+void RC_Init(_RC* Rc,char calib)
 {
-	Rc->I2C = hi2cx;
 	RC_Calib(Rc,calib);
 	RC_Read_EEPROM(Rc);
 }
@@ -216,3 +220,69 @@ float fsign(float x)
 		return -1.0f;
 	else return 0;
 }
+
+
+
+
+void recieve_sbus_radio(_SBus* sbus , _RC* Rc)
+{
+  if( sbus->flag==1){
+		sbus->flag=0;
+
+		for(int co=0;co<25 ;co++){
+  switch (sbus->state)
+  {
+    case 0:
+      if(sbus->buffer[co] == 0x0F)
+        sbus->state++;
+      else
+        sbus->state=0;
+      break;
+    case 1:
+     // if(c == 0x00 && sbus->m == 22)
+		if( sbus->m == 22)
+      {
+        sbus->state++;
+        break;
+      }
+      else
+      {
+        sbus->data[sbus->m] = sbus->buffer[co];
+        sbus->m++;
+        sbus->state=1;
+      }
+      if(sbus->m > 22)
+      {
+        sbus->m = 0;
+        sbus->state=0;
+        break;
+      }
+      break;
+    case 2:
+      sbus->state=0;
+      sbus->m=0;
+	  	//sbus->ready_data =1;
+		  sbus->channel[0] = (sbus->data[0]    | sbus->data[1]<<8)                         & 0x07FF; //roll
+      sbus->channel[1] = (sbus->data[1]>>3 | sbus->data[2]<<5)                         & 0x07FF; //pitch
+      sbus->channel[2] = (sbus->data[2]>>6 | sbus->data[3]<<2 | sbus->data[4]<<10)     & 0x07FF; //throtle
+      sbus->channel[3] = (sbus->data[4]>>1 | sbus->data[5]<<7)                         & 0x07FF; //yaw
+      sbus->channel[4] = (sbus->data[5]>>4 | sbus->data[6]<<4)                         & 0x07FF; //
+      sbus->channel[5] = (sbus->data[6]>>7 | sbus->data[7]<<1 | sbus->data[8]<<9 )     & 0x07FF; //pot
+      sbus->channel[6] = (sbus->data[8]>>2 | sbus->data[9]<<6)                         & 0x07FF; //pot 
+      sbus->channel[7] = (sbus->data[9]>>5 | sbus->data[10]<<3)                        & 0x07FF;
+	    sbus->channel[8] = (sbus->data[11]   | sbus->data[12]<<8)                        & 0x07FF;
+			Rc->RC_channel[0]= sbus->channel[7];
+			Rc->RC_channel[1]= sbus->channel[4];
+			Rc->RC_channel[2]= sbus->channel[5];
+			Rc->RC_channel[3]= sbus->channel[6];
+			Rc->RC_channel[4]= sbus->channel[3];
+			Rc->RC_channel[5]= sbus->channel[0];
+			Rc->RC_channel[6]= sbus->channel[2];
+			Rc->RC_channel[7]= sbus->channel[1];
+	   	RC_2_SetPoint(Rc);
+      break;
+      
+      
+ }
+}
+	}}

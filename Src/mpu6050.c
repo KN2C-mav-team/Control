@@ -1,3 +1,4 @@
+#include "main.h"
 #include "mpu6050.h"
 
 
@@ -7,13 +8,13 @@ ch2int _con;
 
 void Mpu_Write(MPU_SENSOR *sen,char Reg,char data)
 {
-	HAL_I2C_Mem_Write(&sen->I2C,sen->Add,Reg,1,(uint8_t *)&data,1,1000);
+	HAL_I2C_Mem_Write(&sen->I2C,sen->Add,Reg,1,(uint8_t *)&data,1,10);
 }
 
 char  Mpu_Read(MPU_SENSOR *sen,char Reg)
 {
 	char data;
-	HAL_I2C_Mem_Read(&sen->I2C,sen->Add,Reg,1,(uint8_t *)&data,1,1000);
+	HAL_I2C_Mem_Read(&sen->I2C,sen->Add,Reg,1,(uint8_t *)&data,1,10);
 	return data;
 }
 
@@ -62,7 +63,7 @@ void init_mpu(MPU_SENSOR *sen,I2C_HandleTypeDef *hi2cx , int address , int calib
 char  ping_mpu(MPU_SENSOR *sen)
 {
 	char data=0;
-	HAL_I2C_Mem_Read(&sen->I2C,sen->Add,MPUREG_WHOAMI,1,(uint8_t *)&data,1,1000);
+	HAL_I2C_Mem_Read(&sen->I2C,sen->Add,MPUREG_WHOAMI,1,(uint8_t *)&data,1,10);
 	return data;
 }
 
