@@ -8,13 +8,12 @@
 #include "math.h"
 #include "Kalman.h"
 
-
 #define focal_pix   3// 290
 
 #define acc_noise    3
 #define opti_noise   25
 
-#define acc_threshold        4
+#define acc_threshold        8
 
 #define	F_CUT_Gyro1			   	4.0f 
 #define FILTER_Gyro          1/(2*PI*F_CUT_Gyro1)
@@ -24,6 +23,7 @@
 
 #define fps       30.0f
 #define optical_sample_time 0.0155f
+#define ALTITUDE_HOVER     130
 
 typedef struct
 {
@@ -72,7 +72,8 @@ typedef struct
 
 extern optical_par_struct optical_par;
 
-void do_optical_par(_MPC *MPC,_MPC* Mpc_2,MPU_SENSOR *MPU_sen,optical_par_struct *opti);
+//void do_optical_par(_MPC *MPC,_MPC* Mpc_2,MPU_SENSOR *MPU_sen,optical_par_struct *opti);
+void  do_optical_par(_MPC *MPC,_MPC *MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct *opti ,_Ultra *ultra);
 void optical_kalman_init();
 
 extern _Kalman1x1 x_vel,y_vel;

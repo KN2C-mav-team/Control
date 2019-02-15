@@ -3,8 +3,8 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "mpu6050.h"
-#include "Telemetri.h"
 #include "EEPROM.h"
+
 
 #define sbus_packet_size   25
 
@@ -21,7 +21,7 @@
 #define YawThreshold       2
 #define RC_noise           2000  //**//
 
-#define	F_CUT_RC			      25//25
+#define	F_CUT_RC			      15//25
 #define FILTER_RC           1/(2*PI*F_CUT_RC)
 
 
@@ -49,6 +49,7 @@ extern _SBus SBUS;
 typedef struct 
 {
 	uint16_t RC_channel[8];
+  uint16_t last_RC_channel[8];
 	uint16_t channel_offset[8];
 	uint16_t channel_scale[8];
 	float Throttle,last_Throttle,Throttle_save;
@@ -78,6 +79,8 @@ void RC_Calib(_RC* Rc,char calib);
 void RC_2_SetPoint(_RC* Rc);
 void RC_Read_EEPROM(_RC* Rc);
 void recieve_sbus_radio(_SBus* sbus , _RC* Rc);
+void SBUS_Packet_ground_mode() ; 
+void SBUS_Packet_fly_mode() ;
 float fsign(float x);
 
 #endif 

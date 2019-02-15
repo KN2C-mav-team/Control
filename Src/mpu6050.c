@@ -24,28 +24,28 @@ void init_mpu(MPU_SENSOR *sen,I2C_HandleTypeDef *hi2cx , int address , int calib
 	sen->Add = address;
 	
 	Mpu_Write(sen,MPUREG_PWR_MGMT_1,0x80);
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_SMPLRT_DIV,0x00);
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_PWR_MGMT_1,0x03); 
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_GYRO_CONFIG,BITS_FS_2000DPS); 
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_USER_CTRL,0x00); 
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_INT_PIN_CFG,0x02); 
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_CONFIG, BITS_DLPF_CFG_20HZ); 
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	Mpu_Write(sen,MPUREG_ACCEL_CONFIG,0x18);  // Accel scale 16g (2048LSB/g) 
-	HAL_Delay(5);
+	HAL_Delay(10);
 	
 	gyro_calib(sen,calib);
 	
@@ -55,7 +55,6 @@ void init_mpu(MPU_SENSOR *sen,I2C_HandleTypeDef *hi2cx , int address , int calib
 
 	sen->Gravity  = EEPROM_Read_int16_t(EEPROM_GRAVITY);
 	
-	print2pc("Mpu:%d,%d",Mpu_Read(sen,MPUREG_GYRO_CONFIG),Mpu_Read(sen,MPUREG_CONFIG));
 	
 }
 
@@ -139,7 +138,6 @@ void gyro_calib(MPU_SENSOR *sen,char permision)
 	
     if(permision==1)
     {     
-				print2pcs("start gyro calib \r");
         HAL_Delay(1000); 
         sen->gyrox_offset=0;           
         sen->gyroy_offset=0;    
@@ -153,7 +151,6 @@ void gyro_calib(MPU_SENSOR *sen,char permision)
             GY_ave=GY_ave+sen->gyro_y_real;
             GZ_ave=GZ_ave+sen->gyro_z_real;
 					
-						print2pc("Gyro = %d,%d,%d\r",(int)sen->gyro_x_real,(int)sen->gyro_y_real,(int)sen->gyro_z_real);
         }      
         GX_ave/=100;
         GY_ave/=100;
@@ -162,12 +159,7 @@ void gyro_calib(MPU_SENSOR *sen,char permision)
         sen->gyrox_offset=(int)GX_ave;     
         sen->gyroy_offset=(int)GY_ave;     
         sen->gyroz_offset=(int)GZ_ave;  
-
-				print2pc("Gyro_offset = %d,%d,%d \r",(int)sen->gyrox_offset,(int)sen->gyroy_offset,(int)sen->gyroz_offset);
             
-         
-        
-				
 				EEPROM_Write_int16_t(EEPROM_GYRO_Offset_X,(int16_t)sen->gyrox_offset);
         EEPROM_Write_int16_t(EEPROM_GYRO_Offset_Y,(int16_t)sen->gyroy_offset);
 				EEPROM_Write_int16_t(EEPROM_GYRO_Offset_Z,(int16_t)sen->gyroz_offset);

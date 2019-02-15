@@ -1,48 +1,22 @@
 #include "main.h"
-#include "Odometery.h"
 #include "Kalman.h"
 #include "Control.h"
 #include "par_optical.h"
+#include "Odometery.h"
 
-int start_flag_orb=0;
 Odometery_Pro Cam_Position;
 Odometery_Pro ORB_Position;
-//optical_par_struct optical_par;
-//.....ch.....
-MPU_History_Data MPU_Hist;
+
 _Kalman2x2 Cam_X_Kalman,Cam_Y_Kalman,Cam_Z_Kalman;
 _Kalman2x2 Ultra_Z_Kalman;
 _Kalman2x2 ORB_X_Kalman,ORB_Y_Kalman,ORB_Z_Kalman;
-//.........
-//************************OPTICAL FLOW********************************************************
-void Optical_Flow_get_data(_MPC* Mpc,Odometery_Pro *Cam_Vel,MPU_SENSOR *sen,MPU_History_Data* MPU_hist)
-{
-	MPU_hist->Gyro_X[MPU_hist->counter] = -15.882*1.13*sen->gyro_x;
-	MPU_hist->Gyro_Y[MPU_hist->counter++] = 15.882*1.13*sen->gyro_y;
-	
-	
-	MPU_hist->counter %= History_Amount;
-	
-	if(Mpc->ready)
-	{
-		Cam_Vel->Vel_X = ((float)Mpc->data[0]) / Velocity_Scale;
-		Cam_Vel->Vel_Y = ((float)Mpc->data[1]) / Velocity_Scale;
-		
-		//Velocity_Correction(Cam_Vel,MPU_hist,30);
-		
-		Mpc->ready = 0;
-	}
-	
-	
-	
-}
 
 //****************************ORB**********************************************
+ void window_get_data(_MPC* Mpc ){
+
+ };
 void ORB_get_data(_MPC* Mpc,_MPC* Mpc_2,Odometery_Pro *ORB_POS,MPU_SENSOR *sen,optical_par_struct *opti)
-//void ORB_get_data(_MPC* Mpc,Odometery_Pro *ORB_POS,MPU_SENSOR *sen)
 {
-  start_flag_orb++;
-	//if(start_flag_orb>=500){
 	
 	ORB_POS->Acc_y = Mpu.acc_x - Mahony.pure_acc_x;
 	ORB_POS->Acc_y = -100*((ORB_Position.Acc_y*9.81f)/Mpu.Gravity);
@@ -108,8 +82,8 @@ void ORB_get_data(_MPC* Mpc,_MPC* Mpc_2,Odometery_Pro *ORB_POS,MPU_SENSOR *sen,o
 	
 	ORB_POS->data_check++;
 	ORB_Position.filter_flag=0;
-//	if(Mpc_2->ready)
-//	{
+	if(Mpc_2->ready)
+	{
 		ORB_POS->Vel_Y=0;
 		
 		ORB_Position.filter_flag=1;
@@ -130,14 +104,13 @@ void ORB_get_data(_MPC* Mpc,_MPC* Mpc_2,Odometery_Pro *ORB_POS,MPU_SENSOR *sen,o
 
 		
   	Mpc_2->ready = 0;
-	//}	
+	}	
 }
 //}
 
 void Scaling_ORB_POS(Odometery_Pro *ORB_POS,_MPC *MPC,float Height)
 {
-	  start_flag_orb++;
-	//if(start_flag_orb>=500){
+
 	if( Height< 35 && Height> 30 && ORB_POS->ORB_Scale_state == 1)
 	{
 		ORB_POS->H1 = Height;
@@ -151,14 +124,9 @@ void Scaling_ORB_POS(Odometery_Pro *ORB_POS,_MPC *MPC,float Height)
 		ORB_POS->ORB_Axis_Scale = (ORB_POS->H2 - ORB_POS->H1)/(ORB_POS->Z2-ORB_POS->Z1);
 		ORB_POS->ORB_Scale_state = 1;
 	}
-//}
 }
 void Correct_ORB_POS(Odometery_Pro *ORB_POS)
 {
-	  start_flag_orb++;
-	//if(start_flag_orb>=500){
-	//if( ORB_POS->ORB_Axis_Scale !=0 )
-	//{
 //		ORB_POS->Modified_POS_X = ORB_POS->POS_X*ORB_POS->ORB_Axis_Scale;
 //		ORB_POS->Modified_POS_Y = ORB_POS->POS_Y*ORB_POS->ORB_Axis_Scale;
 //		ORB_POS->Modified_POS_Z = ORB_POS->POS_Z*ORB_POS->ORB_Axis_Scale;
@@ -222,118 +190,9 @@ void Correct_ORB_POS(Odometery_Pro *ORB_POS)
 //	ORB_Position.POS_Z_Diff = ORB_Position.POS_Z_Diff_Last+(DT / ( FILTER_CAM_DIFF + DT)) * (ORB_Position.POS_Z_Diff-ORB_Position.POS_Z_Diff_Last);
 	ORB_Position.POS_Z_Diff_Last = ORB_Position.POS_Z_Diff;
 
-	//}
-//}
-}
-//**********************************PTAM****************************
-void PTAM_get_data(_MPC* Mpc,Odometery_Pro *Cam_POS,MPU_SENSOR *sen)
-{
 
-	Cam_POS->Acc_x = Mpu.acc_x - Mahony.pure_acc_x;
-	Cam_POS->Acc_x = 100*((Cam_Position.Acc_x*9.81f)/Mpu.Gravity);
-	
-	Cam_POS->Acc_y = Mpu.acc_y - Mahony.pure_acc_y;
-	Cam_POS->Acc_y = -100*((Cam_Position.Acc_y*9.81f)/Mpu.Gravity);
-
-	Cam_POS->Acc_z = Mpu.acc_z - Mahony.pure_acc_z;
-	Cam_POS->Acc_z = 100*((Cam_Position.Acc_z*9.81f)/Mpu.Gravity);
-	
-	if(Mpc->ready)
-	{
-		Cam_POS->POS_X = ((float)Mpc->data[0]) / Velocity_Scale;
-		Cam_POS->POS_Y = ((float)Mpc->data[1]) / Velocity_Scale;
-		Cam_POS->POS_Z = ((float)Mpc->data[2]) / Velocity_Scale;
-		
-		Mpc->ready = 0;
-	}	
 }
 
-
-
-void Velocity_Correction(Odometery_Pro *Cam_Vel,MPU_History_Data* MPU_hist,int Delay)
-{
-	int pointer = MPU_hist->counter;
-	if(pointer < Delay)
-		pointer = History_Amount - (Delay - pointer);
-	else
-		pointer -= Delay;
-	
-	
-	MPU_hist->G_X = MPU_hist->Gyro_X[pointer];
-	MPU_hist->G_Y = MPU_hist->Gyro_Y[pointer];
-	
-	Cam_Vel->Vel_X = Cam_Vel->Vel_X - MPU_hist->G_X  ;
-	Cam_Vel->Vel_Y = Cam_Vel->Vel_Y - MPU_hist->G_Y  ;
-	
-	Cam_Vel->Vel_X=Cam_Vel->Vel_X_Last+((DT*15) / ( Cam_Velo_Filter + (DT*15))) * (Cam_Vel->Vel_X-Cam_Vel->Vel_X_Last);
-	Cam_Vel->Vel_Y=Cam_Vel->Vel_Y_Last+((DT*15) / ( Cam_Velo_Filter + (DT*15))) * (Cam_Vel->Vel_Y-Cam_Vel->Vel_Y_Last);
-
-	Cam_Vel->Vel_X_Last = Cam_Vel->Vel_X;
-	Cam_Vel->Vel_Y_Last = Cam_Vel->Vel_Y;	
-}
-
-void Scaling_Cam_POS(Odometery_Pro *Cam_POS,float Height)
-{
-	if( Height< 35 && Height> 30 && Cam_POS->Scale_state == 1)
-	{
-		Cam_POS->H1 = Height;
-		Cam_POS->Z1 = Cam_POS->POS_Z;
-		Cam_POS->Scale_state = 0;
-	}
-	else if(Height< 105 && Height> 100 && Cam_POS->Scale_state == 0)
-	{
-		Cam_POS->H2 = Height;
-		Cam_POS->Z2 = Cam_POS->POS_Z;
-		Cam_POS->Axis_Scale = (Cam_POS->H2 - Cam_POS->H1)/(Cam_POS->Z2-Cam_POS->Z1);
-		Cam_POS->Scale_state = 1;
-	}
-}
-
-
-void Correct_Cam_POS(Odometery_Pro *Cam_POS)
-{
-//	if( Cam_POS->Axis_Scale !=0 )
-//	{
-//		Cam_POS->Modified_POS_X = Cam_POS->POS_X*Cam_POS->Axis_Scale;
-//		Cam_POS->Modified_POS_Y = Cam_POS->POS_Y*Cam_POS->Axis_Scale;
-//		Cam_POS->Modified_POS_Z = Cam_POS->H1 + (Cam_POS->POS_Z-Cam_POS->Z1)*Cam_POS->Axis_Scale ;
-//	
-//	
-//	
-//	kalman_predict_2X2(&Cam_X_Kalman,Cam_Position.Acc_x,Cam_Position.Modified_POS_X,2,8);
-//	kalman_predict_2X2(&Cam_Y_Kalman,Cam_Position.Acc_y,Cam_Position.Modified_POS_Y,2,8);
-//	
-//	if(Cam_Position.Modified_POS_Z !=0)					
-//	kalman_predict_2X2(&Cam_Z_Kalman,Cam_Position.Acc_z,Cam_Position.Modified_POS_Z,2,8);
-//	
-//	Cam_Position.Modified_POS_X = Cam_X_Kalman.STATE[0][0];
-//	Cam_Position.Modified_POS_Y = Cam_Y_Kalman.STATE[0][0];
-//	//Cam_Position.Modified_POS_Z = Cam_Z_Kalman.STATE[0][0];					
-//	
-//	
-//	Cam_Position.POS_X_Diff =(float)( Cam_Position.Modified_POS_X - Cam_Position.POS_X_Last)/DT; 
-//	Cam_Position.POS_X_Last= Cam_Position.Modified_POS_X;
-//	
-//	Cam_Position.POS_X_Diff=Cam_Position.POS_X_Diff_Last+(DT / ( FILTER_CAM_DIFF + DT)) * (Cam_Position.POS_X_Diff-Cam_Position.POS_X_Diff_Last);
-//	Cam_Position.POS_X_Diff_Last = Cam_Position.POS_X_Diff;
-//	
-//	
-//	
-//	Cam_Position.POS_Y_Diff =(float)( Cam_Position.Modified_POS_Y - Cam_Position.POS_Y_Last)/DT; 
-//	Cam_Position.POS_Y_Last= Cam_Position.Modified_POS_Y;
-//	
-//	Cam_Position.POS_Y_Diff=Cam_Position.POS_Y_Diff_Last+(DT / ( FILTER_CAM_DIFF + DT)) * (Cam_Position.POS_Y_Diff-Cam_Position.POS_Y_Diff_Last);
-//	Cam_Position.POS_Y_Diff_Last = Cam_Position.POS_Y_Diff;
-//	
-//	
-//		
-//	Cam_Position.POS_Z_Diff =(float)( Cam_Position.Modified_POS_Z - Cam_Position.POS_Z_Last)/DT; 
-//	Cam_Position.POS_Z_Last= Cam_Position.Modified_POS_Z;
-//	
-//	Cam_Position.POS_Z_Diff=Cam_Position.POS_Z_Diff_Last+(DT / ( FILTER_CAM_DIFF + DT)) * (Cam_Position.POS_Z_Diff-Cam_Position.POS_Z_Diff_Last);
-//	Cam_Position.POS_Z_Diff_Last = Cam_Position.POS_Z_Diff;
-//	}
-}
 
 void Cam_Kalman_init(void)
 {

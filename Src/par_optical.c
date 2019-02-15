@@ -1,15 +1,15 @@
 #include "main.h"
+#include "Altitude.h"
 #include "MPC.h"
 #include "par_optical.h"
 #include "Odometery.h"
-
 float gyro_buff_x[14], gyro_buff_y[14];
 optical_par_struct optical_par;
 _Kalman1x1 x_vel,y_vel;
 int for_kooft=0,for_kooft_num=0;
 float  optical_c_x=1.0,optical_c_y=1.0;
 double counter_mpc_for_check=0;
-void do_optical_par(_MPC *MPC,_MPC* MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct *opti)
+void do_optical_par(_MPC *MPC,_MPC *MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct *opti ,_Ultra  *ultra)
 {
 	
 	// baraye teste khoruji  
@@ -32,6 +32,7 @@ void do_optical_par(_MPC *MPC,_MPC* MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct
 	
 	opti->Gyro_X_sum += (MPU_sen->gyro_x);
 	opti->Gyro_Y_sum += (MPU_sen->gyro_y);
+		
 
 
   	if (MPC->ready)
@@ -44,21 +45,23 @@ void do_optical_par(_MPC *MPC,_MPC* MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct
 			
 		opti->Gyro_X= (opti->Gyro_X_sum); //*DT ro bordam jaye dg
 		opti->Gyro_Y= (opti->Gyro_Y_sum);	
+			
+//			if(fabs(opti->Gyro_X) <0.01)opti->Gyro_X=0;
+//			if(fabs(opti->Gyro_Y )<0.01)opti->Gyro_Y=0;
 //			
 //		opti->Gyro_X= opti->last_buff_Gyro_X; //*DT ro bordam jaye dg
 //		opti->Gyro_Y= 	opti->last_buff_Gyro_Y;	
 			
 	  opti->Gyro_X_sum=0;
-		opti->Gyro_Y_sum=0;	
-					
+		opti->Gyro_Y_sum=0;				
 		opti->delta_X = ((float)MPC->data[0])/(100);
 		opti->delta_Y = ((float)MPC->data[1])/(100);
 		opti->data_check = (int)MPC->data[2];
 		if(opti->data_check !=255){
 					opti->delta_X = 0;
-		opti->delta_Y = 0;}
+		opti->delta_Y = 0;} 
 			
-   opti->Gyro_X = opti->last_Gyro_X +(optical_sample_time/(FILTER_Gyro + optical_sample_time))*(opti->Gyro_X - opti->last_Gyro_X);  
+    opti->Gyro_X = opti->last_Gyro_X +(optical_sample_time/(FILTER_Gyro + optical_sample_time))*(opti->Gyro_X - opti->last_Gyro_X);  
   	opti->Gyro_Y = opti->last_Gyro_Y +(optical_sample_time/(FILTER_Gyro + optical_sample_time))*(opti->Gyro_Y - opti->last_Gyro_Y);
 	
 		opti->diff_Gyro_X=opti->Gyro_X - (opti->last_Gyro_X) ;
@@ -67,13 +70,17 @@ void do_optical_par(_MPC *MPC,_MPC* MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct
 		opti->last_Gyro_X = opti->Gyro_X;
 		opti->last_Gyro_Y = opti->Gyro_Y;
 			
-opti->Gyro_X=	(opti->Gyro_X*1.15)		;	
-	opti->Gyro_Y=	(opti->Gyro_Y*1.15);
+    opti->Gyro_X=	(opti->Gyro_X*1.15)		;	
+	  opti->Gyro_Y=	(opti->Gyro_Y*1.15);
 		opti->delta_X_correct= opti->delta_X + (opti->Gyro_X);
 		opti->delta_Y_correct= opti->delta_Y - (opti->Gyro_Y);
 		
-	  opti->real_vel_X= (opti->delta_X_correct * Ultra.point ) / focal_pix;  // *fps to change delta x to velcocity
-		opti->real_vel_Y= (opti->delta_Y_correct * Ultra.point ) / focal_pix;
+	  opti->real_vel_X= (opti->delta_X_correct * ultra->point ) / focal_pix;  // *fps to change delta x to velcocity
+		opti->real_vel_Y= (opti->delta_Y_correct * ultra->point ) / focal_pix;
+		
+//	 opti->real_vel_X= (opti->delta_X_correct * ALTITUDE_HOVER ) / focal_pix;  // *fps to change delta x to velcocity
+//		opti->real_vel_Y= (opti->delta_Y_correct * ALTITUDE_HOVER ) / focal_pix;
+//		
 		optical_c_x=1;
 		optical_c_y=1;
 

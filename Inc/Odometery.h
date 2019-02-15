@@ -36,33 +36,18 @@ typedef struct
 	float Modified_POS_X, Modified_POS_Y, Modified_POS_Z;
 }Odometery_Pro;
 
-typedef struct
-{
-	float Gyro_X[History_Amount],Gyro_Y[History_Amount];
-	float G_X,G_Y;
-	int counter;
-}MPU_History_Data;
-
-extern MPU_History_Data MPU_Hist;
 extern Odometery_Pro Cam_Position;
 extern Odometery_Pro ORB_Position;
 extern _Kalman2x2 Cam_X_Kalman,Cam_Y_Kalman,Cam_Z_Kalman;
 extern _Kalman2x2 Ultra_Z_Kalman;
-//extern optical_par_struct optical_par;
 
-void Optical_Flow_get_data(_MPC* Mpc,Odometery_Pro *Cam_Vel,MPU_SENSOR *sen,MPU_History_Data* MPU_hist);
-void PTAM_get_data(_MPC* Mpc,Odometery_Pro *Cam_POS,MPU_SENSOR *sen);
-void Velocity_Correction(Odometery_Pro *Cam_Vel,MPU_History_Data* MPU_hist,int Delay);
 void kalman_predict_2X2(_Kalman2x2* K_F_DATA,float acc,float mesurement,float MeasureNoise,float ProNoise);
 void Cam_Kalman_init(void);
-void Correct_Cam_POS(Odometery_Pro *Cam_POS);
-void Correct_ORB_POS(Odometery_Pro *ORB_POS);
-void Scaling_Cam_POS(Odometery_Pro *Cam_POS,float Height);
 void Correct_ORB_POS(Odometery_Pro *ORB_POS);
 void Scaling_ORB_POS(Odometery_Pro *ORB_POS,_MPC *MPC,float Height);
 void ORB_get_data(_MPC* Mpc,_MPC* Mpc_2,Odometery_Pro *ORB_POS,MPU_SENSOR *sen,optical_par_struct *opti);
-//void ORB_get_data(_MPC* Mpc,Odometery_Pro *ORB_POS,MPU_SENSOR *sen);
 void ORB_Kalman_init(void);
+void window_get_data(_MPC* Mpc);
 
 
 #endif 

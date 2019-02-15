@@ -569,24 +569,9 @@
               <FilePath>..\Src\mpu6050.c</FilePath>
             </File>
             <File>
-              <FileName>MS5611.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\MS5611.c</FilePath>
-            </File>
-            <File>
-              <FileName>NRF.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\NRF.c</FilePath>
-            </File>
-            <File>
               <FileName>RC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\RC.c</FilePath>
-            </File>
-            <File>
-              <FileName>Telemetri.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\Telemetri.c</FilePath>
             </File>
             <File>
               <FileName>Odometery.c</FileName>

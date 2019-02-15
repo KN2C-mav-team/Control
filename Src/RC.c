@@ -1,8 +1,18 @@
 #include "main.h"
 #include "RC.h"
-#include "NRF.h"
+#include "Control.h"
 _RC RC;
 _SBus SBUS;
+
+unsigned int SBUS_Channel_Data[18];
+unsigned char	 SBUS_Failsafe_Active = 0;
+unsigned char	 SBUS_Lost_Frame = 0;
+unsigned char	 SBUS_Current_Channel = 0;
+unsigned char	 SBUS_Current_Channel_Bit = 0;
+unsigned char	 SBUS_Current_Packet_Bit = 0;
+uint8_t	 SBUS_Packet_Data[25];
+unsigned char	 SBUS_Packet_Position = 0;
+
 int moj_rc_flag=1;
 
 void RC_2_SetPoint(_RC* Rc)
@@ -134,7 +144,6 @@ void RC_Calib(_RC* Rc,char calib)
 		}
 
 		Rc->init = 1;
-		print2pcs("RC calib:(for End please send 's')");
 		HAL_Delay(1500);
 		while(Rc->init == 1)
 		{
@@ -153,8 +162,6 @@ void RC_Calib(_RC* Rc,char calib)
 				Rc->channel_offset[i]=channel_min[i];
 				Rc->channel_scale[i] =channel_max[i]-channel_min[i];  
 		}
-		print2pc("channel offset:%d,%d,%d,%d,%d,%d,%d,%d\r",Rc->channel_offset[0],Rc->channel_offset[1],Rc->channel_offset[2],Rc->channel_offset[3],Rc->channel_offset[4],Rc->channel_offset[5],Rc->channel_offset[6],Rc->channel_offset[7]);
-		print2pc("channel scale :%d,%d,%d,%d,%d,%d,%d,%d\r",Rc->channel_scale[0],Rc->channel_scale[1],Rc->channel_scale[2],Rc->channel_scale[3],Rc->channel_scale[4],Rc->channel_scale[5],Rc->channel_scale[6],Rc->channel_scale[7]);
 		
 		//        EEPROM WRITE
 		EEPROM_Write_int16_t(EEPROM_channel_offset_0,Rc->channel_offset[0]);
@@ -197,11 +204,7 @@ void RC_Read_EEPROM(_RC* Rc)
 	Rc->channel_scale[4]  = EEPROM_Read_int16_t(EEPROM_channel_scale_4);
 	Rc->channel_scale[5]  = EEPROM_Read_int16_t(EEPROM_channel_scale_5);
 	Rc->channel_scale[6]  = EEPROM_Read_int16_t(EEPROM_channel_scale_6);
-	Rc->channel_scale[7]  = EEPROM_Read_int16_t(EEPROM_channel_scale_7);
-	
-	print2pc("RC:\rchannel offset:%d,%d,%d,%d,%d,%d,%d,%d\r",Rc->channel_offset[0],Rc->channel_offset[1],Rc->channel_offset[2],Rc->channel_offset[3],Rc->channel_offset[4],Rc->channel_offset[5],Rc->channel_offset[6],Rc->channel_offset[7]);
-	print2pc("channel scale :%d,%d,%d,%d,%d,%d,%d,%d\r",Rc->channel_scale[0],Rc->channel_scale[1],Rc->channel_scale[2],Rc->channel_scale[3],Rc->channel_scale[4],Rc->channel_scale[5],Rc->channel_scale[6],Rc->channel_scale[7]);
-		
+	Rc->channel_scale[7]  = EEPROM_Read_int16_t(EEPROM_channel_scale_7);		
 
 }	
 
@@ -239,8 +242,8 @@ void recieve_sbus_radio(_SBus* sbus , _RC* Rc)
         sbus->state=0;
       break;
     case 1:
-     // if(c == 0x00 && sbus->m == 22)
-		if( sbus->m == 22)
+      if(sbus->buffer[co] == 0x00 && sbus->m == 22)
+		//if( sbus->m == 22)
       {
         sbus->state++;
         break;
@@ -279,6 +282,31 @@ void recieve_sbus_radio(_SBus* sbus , _RC* Rc)
 			Rc->RC_channel[5]= sbus->channel[0];
 			Rc->RC_channel[6]= sbus->channel[2];
 			Rc->RC_channel[7]= sbus->channel[1];
+		
+//		 Rc->RC_channel[0]= Rc->last_RC_channel[0] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[0] - Rc->last_RC_channel[0]);
+//	    Rc->last_RC_channel[0] =  Rc->RC_channel[0];
+//			
+//					 Rc->RC_channel[1]= Rc->last_RC_channel[1] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[1] - Rc->last_RC_channel[1]);
+//	    Rc->last_RC_channel[1] =  Rc->RC_channel[1];
+//			
+//					 Rc->RC_channel[2]= Rc->last_RC_channel[2] + (DT /(DT + (FILTER_RC*3)))*( Rc->RC_channel[2] - Rc->last_RC_channel[2]);
+//	    Rc->last_RC_channel[2] =  Rc->RC_channel[2];
+//			
+//					 Rc->RC_channel[3]= Rc->last_RC_channel[3] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[3] - Rc->last_RC_channel[3]);
+//	    Rc->last_RC_channel[3] =  Rc->RC_channel[3];
+//			
+//					 Rc->RC_channel[4]= Rc->last_RC_channel[4] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[4] - Rc->last_RC_channel[4]);
+//	    Rc->last_RC_channel[4] =  Rc->RC_channel[4];
+//			
+//					 Rc->RC_channel[5]= Rc->last_RC_channel[5] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[5] - Rc->last_RC_channel[5]);
+//	    Rc->last_RC_channel[5] =  Rc->RC_channel[5];
+//			
+//					 Rc->RC_channel[6]= Rc->last_RC_channel[6] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[6] - Rc->last_RC_channel[6]);
+//	    Rc->last_RC_channel[6] =  Rc->RC_channel[6];
+//			
+//					 Rc->RC_channel[7]= Rc->last_RC_channel[7] + (DT /(DT + FILTER_RC))*( Rc->RC_channel[7] - Rc->last_RC_channel[7]);
+//	    Rc->last_RC_channel[7] =  Rc->RC_channel[7];
+			
 	   	RC_2_SetPoint(Rc);
       break;
       
@@ -286,3 +314,98 @@ void recieve_sbus_radio(_SBus* sbus , _RC* Rc)
  }
 }
 	}}
+
+	
+	
+void SBUS_Packet_ground_mode(){
+	           			SBUS_Channel_Data[0] =  994;//roll
+									SBUS_Channel_Data[1] =  994; //pitch
+									SBUS_Channel_Data[2] =  309; //throtle
+									SBUS_Channel_Data[3] =  309; //yaw
+									SBUS_Channel_Data[4] =  306;
+									SBUS_Channel_Data[5] =  306; //sw
+									SBUS_Channel_Data[6] =  306;
+									SBUS_Channel_Data[7] =  306;  //thr
+
+									SBUS_Failsafe_Active = 0;
+									SBUS_Lost_Frame = 1;
+									
+									for(SBUS_Packet_Position = 0; SBUS_Packet_Position < 25; SBUS_Packet_Position++) SBUS_Packet_Data[SBUS_Packet_Position] = 0x00;  //Zero out packet data
+									
+									SBUS_Current_Packet_Bit = 0;
+									SBUS_Packet_Position = 0;
+									SBUS_Packet_Data[SBUS_Packet_Position] = 0x0F;  //Start Byte
+									SBUS_Packet_Position++;
+  
+									for(SBUS_Current_Channel = 0; SBUS_Current_Channel < 16; SBUS_Current_Channel++)
+									{
+										for(SBUS_Current_Channel_Bit = 0; SBUS_Current_Channel_Bit < 11; SBUS_Current_Channel_Bit++)
+										{
+											if(SBUS_Current_Packet_Bit > 7)
+											{
+												SBUS_Current_Packet_Bit = 0;  //If we just set bit 7 in a previous step, reset the packet bit to 0 and
+												SBUS_Packet_Position++;       //Move to the next packet byte
+											}
+											SBUS_Packet_Data[SBUS_Packet_Position] |= (((SBUS_Channel_Data[SBUS_Current_Channel]>>SBUS_Current_Channel_Bit) & 0x01)<<SBUS_Current_Packet_Bit);  //Downshift the channel data bit, then upshift it to set the packet data byte
+											SBUS_Current_Packet_Bit++;
+										}
+									}
+									if(SBUS_Channel_Data[16] > 1023) SBUS_Packet_Data[23] |= (1<<0);  //Any number above 1023 will set the digital servo bit
+									if(SBUS_Channel_Data[17] > 1023) SBUS_Packet_Data[23] |= (1<<1);
+									if(SBUS_Lost_Frame != 0) SBUS_Packet_Data[23] |= (1<<2);          //Any number above 0 will set the lost frame and failsafe bits
+									if(SBUS_Failsafe_Active != 0) SBUS_Packet_Data[23] |= (1<<3);
+									SBUS_Packet_Data[24] = 0x00;  //End byte
+									
+									HAL_UART_Transmit(&huart3,(uint8_t*)SBUS_Packet_Data, 25 , 1);
+
+
+}
+
+
+void SBUS_Packet_fly_mode(){
+	           			SBUS_Channel_Data[0] =  RC.RC_channel[5] -window_detection.X.Out_float;// - Velocity.Y.Out_float;//roll
+									SBUS_Channel_Data[1] =  RC.RC_channel[7] + window_detection.Y.Out_float ; //pitch
+									SBUS_Channel_Data[2] =  RC.RC_channel[6] ; //throtle
+									SBUS_Channel_Data[3] =  RC.RC_channel[4]; //yaw
+
+	
+
+									SBUS_Channel_Data[4] =  RC.RC_channel[1];
+									SBUS_Channel_Data[5] =  RC.RC_channel[2]; //sw
+									SBUS_Channel_Data[6] =  RC.RC_channel[3];
+									SBUS_Channel_Data[7] =  RC.RC_channel[0];  //thr
+								//  SBUS_Channel_Data[8] = 0;//RC.RC_channel[7];
+
+									SBUS_Failsafe_Active = 0;
+									SBUS_Lost_Frame = 1;
+									
+									for(SBUS_Packet_Position = 0; SBUS_Packet_Position < 25; SBUS_Packet_Position++) SBUS_Packet_Data[SBUS_Packet_Position] = 0x00;  //Zero out packet data
+									
+									SBUS_Current_Packet_Bit = 0;
+									SBUS_Packet_Position = 0;
+									SBUS_Packet_Data[SBUS_Packet_Position] = 0x0F;  //Start Byte
+									SBUS_Packet_Position++;
+  
+									for(SBUS_Current_Channel = 0; SBUS_Current_Channel < 16; SBUS_Current_Channel++)
+									{
+										for(SBUS_Current_Channel_Bit = 0; SBUS_Current_Channel_Bit < 11; SBUS_Current_Channel_Bit++)
+										{
+											if(SBUS_Current_Packet_Bit > 7)
+											{
+												SBUS_Current_Packet_Bit = 0;  //If we just set bit 7 in a previous step, reset the packet bit to 0 and
+												SBUS_Packet_Position++;       //Move to the next packet byte
+											}
+											SBUS_Packet_Data[SBUS_Packet_Position] |= (((SBUS_Channel_Data[SBUS_Current_Channel]>>SBUS_Current_Channel_Bit) & 0x01)<<SBUS_Current_Packet_Bit);  //Downshift the channel data bit, then upshift it to set the packet data byte
+											SBUS_Current_Packet_Bit++;
+										}
+									}
+									if(SBUS_Channel_Data[16] > 1023) SBUS_Packet_Data[23] |= (1<<0);  //Any number above 1023 will set the digital servo bit
+									if(SBUS_Channel_Data[17] > 1023) SBUS_Packet_Data[23] |= (1<<1);
+									if(SBUS_Lost_Frame != 0) SBUS_Packet_Data[23] |= (1<<2);          //Any number above 0 will set the lost frame and failsafe bits
+									if(SBUS_Failsafe_Active != 0) SBUS_Packet_Data[23] |= (1<<3);
+									SBUS_Packet_Data[24] = 0x00;  //End byte
+									
+									HAL_UART_Transmit(&huart3,(uint8_t*)SBUS_Packet_Data, 25 , 1);
+
+
+}

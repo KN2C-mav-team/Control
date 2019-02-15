@@ -35,14 +35,10 @@
 1 configuration\telemetri.o: ..\Inc\Define.h
 1 configuration\telemetri.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 1 configuration\telemetri.o: ..\Inc\mpu6050.h
-1 configuration\telemetri.o: ..\Inc\main.h
 1 configuration\telemetri.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 1 configuration\telemetri.o: ..\Inc\EEPROM.h
+1 configuration\telemetri.o: ..\Inc\main.h
 1 configuration\telemetri.o: ..\Inc\mpu6050.h
-1 configuration\telemetri.o: ..\Inc\Telemetri.h
-1 configuration\telemetri.o: ..\Inc\Altitude.h
-1 configuration\telemetri.o: ..\Inc\Telemetri.h
-1 configuration\telemetri.o: ..\Inc\Kalman.h
 1 configuration\telemetri.o: ..\Inc\mavlink/common/mavlink.h
 1 configuration\telemetri.o: ..\Inc\mavlink/common/version.h
 1 configuration\telemetri.o: ..\Inc\mavlink/common/common.h
@@ -181,6 +177,10 @@
 1 configuration\telemetri.o: ..\Inc\mavlink/common/./mavlink_msg_debug.h
 1 configuration\telemetri.o: ..\Inc\MPC.h
 1 configuration\telemetri.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
+1 configuration\telemetri.o: ..\Inc\Altitude.h
+1 configuration\telemetri.o: ..\Inc\Kalman.h
+1 configuration\telemetri.o: ..\Inc\Altitude.h
+1 configuration\telemetri.o: ..\Inc\Telemetri.h
 1 configuration\telemetri.o: ..\Inc\IMU.h
 1 configuration\telemetri.o: ..\Inc\MS5611.h
 1 configuration\telemetri.o: ..\Inc\RC.h

@@ -1,5 +1,6 @@
 #include "EEPROM.h"
-
+#include "main.h"
+#include "mpu6050.h" 
 
 
 ch2int con_;

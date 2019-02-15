@@ -1,5 +1,6 @@
 #include "IMU.h"
 #include "Control.h"
+#include "mpu6050.h"
 
 _IMU Mahony;
 
@@ -7,12 +8,25 @@ _IMU Mahony;
 
 void Update_IMU_Data_Mahony(_IMU *IMU,MPU_SENSOR *sen)
 {
-	HAL_NVIC_DisableIRQ(DMA1_Stream2_IRQn);
-	Mpu_update(sen);   //Alireza: update gyro & acc & gravity
-	HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+	    	HAL_NVIC_DisableIRQ(DMA1_Stream2_IRQn);
+        HAL_NVIC_DisableIRQ(DMA2_Stream2_IRQn);
+	      HAL_NVIC_DisableIRQ(DMA1_Stream5_IRQn);
+      	HAL_NVIC_DisableIRQ(USART3_IRQn);
+	  //    HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+
+	      Mpu_update(sen);  
+	
+      //	HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+				HAL_NVIC_EnableIRQ(USART3_IRQn);
+				HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
+				HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+				HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);	
+
 	update_Accel_weight(IMU,sen);
 	MahonyAHRSupdateIMU(IMU,sen);
 	Update_Euler_angles(IMU,sen);
+	
+
 	
 	
 }
@@ -30,9 +44,8 @@ void update_Accel_weight(_IMU *IMU,MPU_SENSOR *sen)
     sen->g_print=sen->last_g_print+(DT / ( FILTER_G_PRINT + DT)) * (sen->g_print-sen->last_g_print);                
               
     sen->last_g_print=sen->g_print;  
-	
-																	if ( Yaw.flag == 0 ){    // moj
 
+	
 
 																	if(sen->g_print < 0.016f)
 																						IMU->Accel_weight=1.2f;  
@@ -50,26 +63,7 @@ void update_Accel_weight(_IMU *IMU,MPU_SENSOR *sen)
 																						IMU->Accel_weight=0.000001f;
 																	else
 																						IMU->Accel_weight=0.0000001f;
-																}		
-	if (Yaw.flag == 1){         // moj
-		
-																			if(sen->g_print < 0.006f)
-																								IMU->Accel_weight=1.2f;  
-																			else if(sen->g_print < 0.009f)
-																								IMU->Accel_weight=0.8f;          
-																			else if(sen->g_print < 0.014f)
-																								IMU->Accel_weight=0.25f; 
-																			else if(sen->g_print < 0.018f)
-																								IMU->Accel_weight=0.05f; 
-																			else if(sen->g_print < 0.021f)
-																								IMU->Accel_weight=0.005f; 
-																			else if(sen->g_print < 0.023f)
-																								IMU->Accel_weight=0.00005f;      
-																			else if(sen->g_print < 0.026f)
-																								IMU->Accel_weight=0.000001f;
-																			else
-																								IMU->Accel_weight=0.0000001f;  
-																		} 
+															
 																	
 
               

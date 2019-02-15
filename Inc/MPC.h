@@ -1,19 +1,25 @@
 #ifndef H_MPC_H
 #define H_MPC_H
 
-#define MPC_BUFF_AMOUNT  11//34//25 //11:3TA DATA  //21
-#define MPC_BUFF_AMOUNT_2 13
+#define MPC_BUFF_AMOUNT  45//21 //34//25 //11:3TA DATA  //21
+#define MPC_BUFF_AMOUNT_2 21//11 //15
+
+// 0 :optx,1:opty,2:start ,3:windowx 4:win y ; 5:status , 6:scale , 7:turn back , 8: x_marker , 9: y:marker , 10:staus , 11:x orb point  , 12 : z orb point  , 13 : y  point , 14: yaw point ,15:  x orb setpoint ,16 :  z , orb setoint , 17 :  y setpoint ,18 : yaw setpoint ,19 : quad state  
+
 
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "mpu6050.h"
 #include "stdarg.h"
 
+
 ///uint16_t MPC_BUFF_AMOUNT[];
 typedef struct {
 	
 	int data[32];
+	int correct_data[32];
 	char pack_started;
+	char new_pack_started;
 	char sum;
 	char Len;
 	char ready;
@@ -29,6 +35,8 @@ typedef struct {
 	int UART_IRQ_FLAG_2;
 	uint8_t MPC_UART_BUFF[MPC_BUFF_AMOUNT];
   uint8_t MPC_UART_BUFF_2[MPC_BUFF_AMOUNT];
+	
+	int flag_error;
 	
 }_MPC;
 

@@ -3,7 +3,6 @@
 
 #include "stm32f4xx_hal.h"
 #include "Define.h"
-#include "main.h"
 #include "math.h"
 #include "EEPROM.h"
 

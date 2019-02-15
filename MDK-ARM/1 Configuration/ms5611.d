@@ -35,14 +35,10 @@
 1 configuration\ms5611.o: ..\Inc\Define.h
 1 configuration\ms5611.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 1 configuration\ms5611.o: ..\Inc\mpu6050.h
-1 configuration\ms5611.o: ..\Inc\main.h
 1 configuration\ms5611.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 1 configuration\ms5611.o: ..\Inc\EEPROM.h
+1 configuration\ms5611.o: ..\Inc\main.h
 1 configuration\ms5611.o: ..\Inc\mpu6050.h
-1 configuration\ms5611.o: ..\Inc\Telemetri.h
-1 configuration\ms5611.o: ..\Inc\Altitude.h
-1 configuration\ms5611.o: ..\Inc\Telemetri.h
-1 configuration\ms5611.o: ..\Inc\Kalman.h
 1 configuration\ms5611.o: ..\Inc\mavlink/common/mavlink.h
 1 configuration\ms5611.o: ..\Inc\mavlink/common/version.h
 1 configuration\ms5611.o: ..\Inc\mavlink/common/common.h
@@ -181,4 +177,8 @@
 1 configuration\ms5611.o: ..\Inc\mavlink/common/./mavlink_msg_debug.h
 1 configuration\ms5611.o: ..\Inc\MPC.h
 1 configuration\ms5611.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
+1 configuration\ms5611.o: ..\Inc\Altitude.h
+1 configuration\ms5611.o: ..\Inc\Kalman.h
+1 configuration\ms5611.o: ..\Inc\Altitude.h
 1 configuration\ms5611.o: ..\Inc\MS5611.h
+1 configuration\ms5611.o: ..\Inc\Telemetri.h

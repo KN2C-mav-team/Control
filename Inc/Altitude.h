@@ -2,21 +2,22 @@
 #define H_Height_H
 #include "main.h"
 #include "stm32f4xx_hal.h"
-#include "Telemetri.h"
 #include "math.h"
 #include "Kalman.h"
+#include "Altitude.h"
+
 
 
 
 //************************ultra*******************************
-#define Ultra_Trig_ON  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_0,1)
-#define Ultra_Trig_OFF HAL_GPIO_WritePin(GPIOD,GPIO_PIN_0,0)
+#define Ultra_Trig_ON  HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,1)
+#define Ultra_Trig_OFF HAL_GPIO_WritePin(GPIOB,GPIO_PIN_9,0)
 #define Max_Ultra_Thr  450 
 
-#define	F_CUT_Ultra			   		6
+#define	F_CUT_Ultra			   		17
 #define F_CUT_VEL             2
 #define F_CUT_VEL_lpf         2.5f
-#define F_CUT_hpf_VEL_lpf     4.0f
+#define F_CUT_hpf_VEL_lpf     8.0f
 #define FILTER_Ultra          1/(2*PI*F_CUT_Ultra)
 #define FILTER_VEL_hpf        1/(2*PI*F_CUT_VEL) 
 #define FILTER_VEL_lpf        1/(2*PI*F_CUT_VEL_lpf) 
@@ -64,7 +65,7 @@ extern float vel_z;
 extern int counter_loop;
 
 void  Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra);
-float Vel_z(_Kalman1x1 *Kalman_state,_Ultra *ultra,float acc);
+float Vel_z(_Kalman1x1 *Kalman_state,_Ultra *ultra,float acc,TIM_HandleTypeDef _htim);
 void  ultra_filter_lpf(_Ultra* ultra);
 void Ultra_Kalman_init(void);
 #endif 

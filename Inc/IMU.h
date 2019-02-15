@@ -9,7 +9,7 @@
 //typedef struct _MPU_SENSOR MPU_SENSOR;
 
 //*********************************************************
-#define Mahony_twoKpDef        (2.0f * 0.7f)   // 2 * proportional gain
+#define Mahony_twoKpDef        (2.0f * 4.0f)   // 2 * proportional gain
 #define Mahony_twoKiDef        (2.0f * 0.0f)   // 2 * integral gain
 
 

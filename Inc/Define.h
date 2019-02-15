@@ -32,8 +32,8 @@
 
 
 
-#define DT_PULSE      4000
-#define DT            0.004f
+#define DT_PULSE      5000
+#define DT            0.005f
 #define sampleFreq    250.0f
 #define DT_PULSE_1ms  1000
 #define GROUND_MODE   0
