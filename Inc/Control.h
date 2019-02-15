@@ -115,6 +115,10 @@
 
 
 #define Filter_hpf_optical               0.7
+//*********************************************************
+#define scale 160
+
+
 
 
 extern int counter_flag_for_accept_window;
@@ -158,6 +162,8 @@ typedef struct __3D_Vector _3D_Vector;
 extern System_Status Altitude;
 extern System_Status Altitude_Velocity;
 extern System_Status Altitude_take_off;
+extern System_Status AltitudeWithwindow;//Alireza kaz
+extern System_Status YAW;//Alireza kaz
 
 extern _3D_Vector Velocity;
 extern _3D_Vector ORB_position;
@@ -170,6 +176,7 @@ extern _Kalman1x1 vel_marker_x,vel_marker_y,window_x,window_y;
 
 extern int Throttle_bias,Motor_force;
 extern int position_error;
+
 
 void Rc2Controller(_RC Rc);
 void Point2Controller(_IMU IMU,MPU_SENSOR Mpu);

@@ -101,7 +101,7 @@ void Ultra_Kalman_init(void)
 void  ultra_filter_lpf(_Ultra* ultra)
 {
 	float filter,f_cut;
-	f_cut=1.5; //2
+	f_cut=2; //2
 	filter =1/(2*3.14f*f_cut);			
 	ultra->point = ultra->last_point +(ultra->Diff_Time/(filter + ultra->Diff_Time))*(ultra->real-ultra->last_point);  
 	

@@ -1,7 +1,7 @@
 #ifndef H_MPC_H
 #define H_MPC_H
 
-#define MPC_BUFF_AMOUNT  25//2n+5
+#define MPC_BUFF_AMOUNT  21//2n+5
 #define MPC_BUFF_AMOUNT_2 5//11 //15
 
 // 0 :optx,1:opty,2:start ,3:windowx 4:win y ; 5:status , 6:scale , 7:turn back , 8: x_marker , 9: y:marker , 10:staus , 11:x orb point  , 12 : z orb point  , 13 : y  point , 14: yaw point ,15:  x orb setpoint ,16 :  z , orb setoint , 17 :  y setpoint ,18 : yaw setpoint ,19 : quad state  

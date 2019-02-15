@@ -67,6 +67,11 @@ void do_optical_par(_MPC *MPC,_MPC *MPC_2,MPU_SENSOR *MPU_sen,optical_par_struct
 			
     opti->Gyro_X = opti->last_Gyro_X +(optical_sample_time/(FILTER_Gyro + optical_sample_time))*(opti->Gyro_X - opti->last_Gyro_X);  
   	opti->Gyro_Y = opti->last_Gyro_Y +(optical_sample_time/(FILTER_Gyro + optical_sample_time))*(opti->Gyro_Y - opti->last_Gyro_Y);
+		opti->Gyro_X-=0.11;//@Exocrist
+		
+		opti->Gyro_Y-=0.1;//@Exocrist
+		
+		
 		
 		opti->diff_Gyro_X = opti->Gyro_X - (opti->last_Gyro_X) ;
 		opti->diff_Gyro_Y = opti->Gyro_Y - opti->last_Gyro_Y ;

@@ -7,7 +7,7 @@
 1 configuration\odometery.o: ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
 1 configuration\odometery.o: ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h
 1 configuration\odometery.o: ..\Drivers\CMSIS\Include\core_cm4.h
-1 configuration\odometery.o: C:\Program Files\Keil_V5\ARM\ARMCC\Bin\..\include\stdint.h
+1 configuration\odometery.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 1 configuration\odometery.o: ..\Drivers\CMSIS\Include\core_cmInstr.h
 1 configuration\odometery.o: ..\Drivers\CMSIS\Include\core_cmFunc.h
 1 configuration\odometery.o: ..\Drivers\CMSIS\Include\core_cmSimd.h
@@ -33,14 +33,14 @@
 1 configuration\odometery.o: ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h
 1 configuration\odometery.o: ..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h
 1 configuration\odometery.o: ..\Inc\Define.h
-1 configuration\odometery.o: C:\Program Files\Keil_V5\ARM\ARMCC\Bin\..\include\stdio.h
+1 configuration\odometery.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 1 configuration\odometery.o: ..\Inc\mpu6050.h
-1 configuration\odometery.o: C:\Program Files\Keil_V5\ARM\ARMCC\Bin\..\include\math.h
+1 configuration\odometery.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 1 configuration\odometery.o: ..\Inc\EEPROM.h
 1 configuration\odometery.o: ..\Inc\main.h
 1 configuration\odometery.o: ..\Inc\mpu6050.h
 1 configuration\odometery.o: ..\Inc\MPC.h
-1 configuration\odometery.o: C:\Program Files\Keil_V5\ARM\ARMCC\Bin\..\include\stdarg.h
+1 configuration\odometery.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 1 configuration\odometery.o: ..\Inc\Altitude.h
 1 configuration\odometery.o: ..\Inc\Kalman.h
 1 configuration\odometery.o: ..\Inc\Altitude.h

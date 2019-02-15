@@ -324,12 +324,12 @@ void recieve_sbus_radio(_SBus* sbus , _RC* Rc)
 
 void SBUS_Packet_fly_mode(){
 	           	
-				SBUS_Channel_Data[0] =  RC.RC_channel[5] + Velocity.Y.Out ;//roll
-				SBUS_Channel_Data[1] =  RC.RC_channel[7] - Velocity.X.Out ; //pitch
+				SBUS_Channel_Data[0] =  RC.RC_channel[5] + Velocity.Y.Out+window_detection.X.Out ;//roll
+				SBUS_Channel_Data[1] =  RC.RC_channel[7] + Velocity.X.Out ; //pitch
 				
 
 				SBUS_Channel_Data[2] =  RC.RC_channel[6] ; //throtle
-				SBUS_Channel_Data[3] =  RC.RC_channel[4]  ; //yaw
+				SBUS_Channel_Data[3] =  RC.RC_channel[4] + YAW.Out  ; //yaw
 
 
 

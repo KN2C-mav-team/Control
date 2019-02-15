@@ -198,18 +198,18 @@ int main(void)
 			case GROUND_MODE:
 										
 				SBUS_Packet_fly_mode();	
-				if(clock_time%100 == 0 ){			
-					HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_11);
-					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,0);
-				}
+//				if(clock_time%100 == 0 ){			
+//					HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_11);
+//					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,0);
+//				}
 			
 				if(Quad_On(RC) == 1) {
 					Run_State=FLY_MODE;							
 					control_init_(); 
 					Set_zero_system_state();
 					Run_Control = 0;
-					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,0);
-					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,1);
+				//	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,0);
+				//	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,1);
 					
 				}
 
@@ -218,15 +218,17 @@ int main(void)
 			case FLY_MODE:
 			 if(Quad_Off(RC) == 1) Run_State=GROUND_MODE; 
 			
-			 if(clock_time%25 == 0 ){
-				 HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_14);
-				 HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_11);
-			 }
+//			 if(clock_time%25 == 0 ){
+//				 HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_14);
+//				 HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_11);
+//			 }
 			 
 
 			Altitude_control(RC.THR_CUT);
 			Velocity_Control(&Velocity);
-			//Window_detection(&window_detection,&MPC);
+  		Window_detection(&window_detection,&MPC);
+			
+
 			SBUS_Packet_fly_mode();					
 				break;
 			//*************************************************************************************

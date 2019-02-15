@@ -6,6 +6,8 @@
 
 System_Status Altitude;
 System_Status Altitude_take_off;
+System_Status AltitudeWithwindow;
+System_Status YAW;
 _3D_Vector Velocity;
 _3D_Vector window_detection;
 
@@ -80,12 +82,12 @@ int Control(System_Status *In)
 
 void control_init_(void)
 {		
-			Altitude.Kp  = 5	; //map 10 ghermez 7
+			Altitude.Kp  = 7 ; //map 10 ghermez 7
 			Altitude.Ki  = 0  ; //map 5 ghermez 0
 			Altitude.Kd  = 0  ; //map 0 ghermez 0
 						
 			Altitude.Max = 300 ; //map 250 ghermez 500
-			Altitude.Min = -300 ; //map -450 ghermez -500
+			Altitude.Min = -300 ;//map -450 ghermez -500
 			Altitude.Plimit = 300	; //map 250 ghermez 500
 			Altitude.Dlimit = 0.0 ; //map 0 ghermez 0.0
 			Altitude.Ilimit = 0 ; //map 200 ghermez 0	
@@ -96,19 +98,26 @@ void control_init_(void)
 
 void Set_zero_system_state(void)
 {
-		Altitude.setpoint = 110;
+		Altitude.setpoint = 100;
 		Altitude.flag = 1;
 		Altitude.Out =0 ;
 		Altitude.Out_float =0;
 		Altitude.integral_err =0;
 		Altitude.I_save =0;
 		Altitude.err =0;
+		Altitude.Out_bias = 1040; //map 950 ghermez 1040
+	  AltitudeWithwindow.setpoint=25;
+		AltitudeWithwindow.flag=0 ;
+		AltitudeWithwindow.Out =0;
+		AltitudeWithwindow.Out_float =0;
+		AltitudeWithwindow.integral_err =0;
+		AltitudeWithwindow.I_save=0;
+		AltitudeWithwindow.err =0;
 }
 
 void Altitude_control(int Alt_Control_THR){
 
 	
-	Altitude.Out_bias = 1040; //map 950 ghermez 1040
 	
 		if(Alt_Control_THR ==1 ){
 			
@@ -124,7 +133,7 @@ void Altitude_control(int Alt_Control_THR){
 
 				if(Altitude.flag == 1){
 					Control(&Altitude);
-					RC.RC_channel[6] = Altitude.Out_bias + Altitude.Out;}
+					RC.RC_channel[6] = Altitude.Out_bias + Altitude.Out+AltitudeWithwindow.Out;}
 				
 //		if (RC.RC_channel[0]>1000){Altitude.flag = 2;}
 //		else {Altitude.flag = 1;} //jelo giri az noise
@@ -166,8 +175,8 @@ void Velocity_Control(_3D_Vector *Velocity)
 		Velocity->X.point = -x_vel.state ; // jahat e harekat
 	  Velocity->Y.point = -y_vel.state;
 
-  	Velocity->X.setpoint = -2;
-	  Velocity->Y.setpoint = -2;		
+  //	Velocity->X.setpoint = 0;
+	 // Velocity->Y.setpoint = 0;		
 		
 		Velocity->X.diff_point = Velocity->X.point - Velocity->X.last_point;
 		Velocity->X.last_point = Velocity->X.point;
@@ -186,28 +195,28 @@ void Velocity_Control(_3D_Vector *Velocity)
 		
 		//Fuzzy_Gain(OPTICAL_GAIN_SET);
 		
-		
-		Velocity->X.Kp = 4 ;//1.4 ; //zamanike fcut khruji controler 40 bud khub bud hala kardamesh 8 fek konam bas ghavi tar konam//(float)EEPROM_Read_int16_t(EEPROM_opti_x_Kp) / 1000.0f ;
-		Velocity->X.Ki = 1.2 ;//1.5;//(float)EEPROM_Read_int16_t(EEPROM_opti_x_Ki) / 1000.0f ;
-  	Velocity->X.Kd = 0 ;//(float)EEPROM_Read_int16_t(EEPROM_opti_x_Kd) / 1000.0f ;
+		Velocity->X.Kp = 1.3 ;//2.1 ; //zamanike fcut khruji controler 40 bud khub bud hala kardamesh 8 fek konam bas ghavi tar konam//(float)EEPROM_Read_int16_t(EEPROM_opti_x_Kp) / 1000.0f ;
+		Velocity->X.Ki = 0.9		;//2;//(float)EEPROM_Read_int16_t(EEPROM_opti_x_Ki) / 1000.0f ;
+  	Velocity->X.Kd =20 ;//(float)EEPROM_Read_int16_t(EEPROM_opti_x_Kd) / 1000.0f ;
     
 		
-		Velocity->Y.Kp = 4 ;//1.4
-   	Velocity->Y.Ki = 1.2 ;//1.6
-		Velocity->Y.Kd = 0 ;
+		Velocity->Y.Kp = 2.1;//2.1
+   	Velocity->Y.Ki = 1.8 ;//2
+		Velocity->Y.Kd = 20;
 		
 	
-		Velocity->X.Max = 700;//700;
-		Velocity->X.Min = -700;//-700;
+		Velocity->X.Max = 350;//700;
+		Velocity->X.Min = -350;//-700;
 		Velocity->X.Plimit = 200;
-		Velocity->X.Ilimit = 500;//600;
-		Velocity->X.Dlimit = 200 ;
+		Velocity->X.Ilimit = 200;//600;
+		Velocity->X.Dlimit = 100 ;
 		
 		Velocity->Y.Max = Velocity->X.Max;
 		Velocity->Y.Min = Velocity->X.Min;
 		Velocity->Y.Plimit = Velocity->X.Plimit;
 		Velocity->Y.Ilimit = Velocity->X.Ilimit;
 		Velocity->Y.Dlimit = Velocity->X.Dlimit;	
+
 
 		
 			Control(&Velocity->X);	
@@ -245,30 +254,30 @@ if( RC.RC_SW ==1 )
 		case 0:
 				window_detection->X.point = MPC->data[2];
 			
-				window_detection->X.setpoint = 100;
+				window_detection->X.setpoint = 0;
 		
-				if(fabs(window_detection->X.point - window_detection->X.setpoint)<80)
+				if(fabs(window_detection->X.point - window_detection->X.setpoint)<70)
 				{
-					window_detection->X.Kp = 1;
+					window_detection->X.Kp = 1.1;
 					window_detection->X.Ki = 0;
-					window_detection->X.Kd = 0;
+					window_detection->X.Kd = 115;
 				
-					window_detection->X.Max=200;
-					window_detection->X.Min=-200;
-					window_detection->X.Plimit=150;
+					window_detection->X.Max=150;
+					window_detection->X.Min=-150;
+					window_detection->X.Plimit=75;
 					window_detection->X.Dlimit=150;
 					window_detection->X.Ilimit=0;
 				}
 				else
 				{
-					window_detection->X.Kp = 1;
+					window_detection->X.Kp = 0.5;
 					window_detection->X.Ki = 0;
-					window_detection->X.Kd = 0;
+					window_detection->X.Kd = 95;
 					
-					window_detection->X.Max=200;
-					window_detection->X.Min=-200;
-					window_detection->X.Plimit=150;
-					window_detection->X.Dlimit=150;
+					window_detection->X.Max=80;
+					window_detection->X.Min=-80;
+					window_detection->X.Plimit=30;
+					window_detection->X.Dlimit=80;
 					window_detection->X.Ilimit=0;
 				}
 
@@ -282,34 +291,81 @@ if( RC.RC_SW ==1 )
 				Control(&window_detection->X);
 				
 				
-				if(fabs(window_detection->X.point-window_detection->X.setpoint)<50) {Velocity.X.setpoint=15;}
-				else{Velocity.X.setpoint=5;}
+				if(fabs(window_detection->X.point-window_detection->X.setpoint)<90) {Velocity.X.setpoint=-12;}
+			else{Velocity.X.setpoint=-6;}
+			
+		/*	if(MPC->data[5]>180 && fabs(window_detection->X.point-window_detection->X.setpoint)<80 && MPC->data[5]<180)
+			{
+				YAW.flag=1;
+			}
+			else
+				YAW.flag=0;*/
 				
-		//		if(MPC->data[4]>350)	counter_for_start_window_follow=1;
+			if(MPC->data[5]> scale )	
+			{
+				YAW.flag=0;
+				Velocity.X.setpoint=0;
+			Altitude.setpoint = 125;
+			Altitude.Kp  = 8.5	; //map 10 ghermez 7
+			Altitude.Ki  = 0  ; //map 5 ghermez 0
+			Altitude.Kd  = 6  ; //map 0 ghermez 0
+						
+			Altitude.Max = 300 ; //map 250 ghermez 500
+			Altitude.Min = -300 ; //map -450 ghermez -500
+			Altitude.Plimit = 200	; //map 250 ghermez 500
+			Altitude.Dlimit = 0.0 ; //map 0 ghermez 0.0
+			Altitude.Ilimit = 150 ; //map 200 ghermez 0	
+			//	AltitudeWithwindow.setpoint=25;
+			//	AltitudeWithwindow.flag=1;
+				Altitude.flag=1;
+				
+				
+			}
+			
+			//if(MPC->data[5]<170)
+			//	Velocity.X.point=-12;
+				
+			
+			if(MPC->data[5] > scale && fabs(window_detection->X.point-window_detection->X.setpoint)<7
+																									/*&& fabs(MPC->data[3]-AltitudeWithwindow.setpoint)<10&&fabs(MPC->data[6])<3*/
+		)
+			{
+						HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,0);
+						HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,1);
+    				counter_for_start_window_follow=1;
+			}
+
+			
+			
 				
 				Velocity.Y.Out=0;
-				Velocity.Y.integral_err = -200;
+				Velocity.Y.integral_err = 0;
 				
 				
 		break;
 		//---------------------------------------------------------------------------------------------------------------------
 	
 		case 1:
-			Velocity.Y.setpoint=15;
-			Velocity.X.Out=150;
+			
+		Velocity.Y.setpoint=5;
+		Velocity.X.Out=-100;
 		
-			window_detection->X.Out=0;
-			window_detection->Y.Out=0;
+		window_detection->X.Out=0;
+		window_detection->Y.Out=0;
 		
-		  counter_flag_for_accept_window++;
+		counter_flag_for_accept_window++;
 
-			if(counter_flag_for_accept_window>320)		counter_for_start_window_follow=2;
+	/*		if(counter_flag_for_accept_window>320)		
+			{
+				counter_for_start_window_follow=2;
+				
+			} */
 		break;
 		//--------------------------------------------------------------------------------------------------------------------
 		
 		case 2:
-			Velocity.Y.setpoint=15;
-			Velocity.X.Out=-170;
+			Velocity.Y.setpoint=7;
+			Velocity.X.Out=100;
 		
 			window_detection->X.Out=0;
 			window_detection->Y.Out=0;
@@ -327,9 +383,9 @@ if( RC.RC_SW ==1 )
 		
 				if(fabs(window_detection->X.point - window_detection->X.setpoint)<80)
 				{
-					window_detection->X.Kp = 1.2;
+					window_detection->X.Kp = 1.4;
 					window_detection->X.Ki = 0;
-					window_detection->X.Kd = 80;
+					window_detection->X.Kd = 85;
 				
 					window_detection->X.Max=300;
 					window_detection->X.Min=-300;
@@ -339,9 +395,9 @@ if( RC.RC_SW ==1 )
 				}
 				else
 				{
-					window_detection->X.Kp = 0.8;
+					window_detection->X.Kp = 0.9;
 					window_detection->X.Ki = 0;
-					window_detection->X.Kd = 80;
+					window_detection->X.Kd = 90;
 					
 					window_detection->X.Max=300;
 					window_detection->X.Min=-300;
@@ -416,11 +472,11 @@ break;
 			
 }
 	}
-	
-	 else{
+
+		 else{
 		 window_detection->X.Out=0;
 		 window_detection->Y.Out=0;
+			 Altitude.flag=1;
 	 }
-	
 	
 }
