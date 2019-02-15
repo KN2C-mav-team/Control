@@ -1,4 +1,4 @@
-/*
+/**
   ******************************************************************************
   * File Name          : main.c
   * Date               : 30/03/2015 15:47:55
@@ -47,7 +47,6 @@
 #include "Altitude.h"
 #include "MPC.h"
 #include "Odometery.h"
-#include "Optical_Flow.h"
 
 
 /* USER CODE END Includes */
@@ -144,7 +143,7 @@ int main(void)
 
 	
 	init_mpu(&Mpu,&hi2c1,0xD0,0);	
-	MS5611_init(&MS,&hi2c1); //*
+	//MS5611_init(&MS,&hi2c1); //*
 	Nrf_Init(&NRF,hi2c3,15);
 	RC_Init(&RC,hi2c3,0);
 	Pwm_frq(&htim2,600,2048);
@@ -172,7 +171,6 @@ int main(void)
 	z_vel.A=1;
 	z_vel.B=DT;
 	z_vel.P=1;
-	z_vel.need_2_res =0;
 	
 	MPC.ready = 0;
 	MPU_Hist.counter = 0;
@@ -202,17 +200,16 @@ int main(void)
 				  Check_battery((counter%100),Run_State);
 				
 					//      Sen
-					MS5611_Read(&MS);
+					//MS5611_Read(&MS);
 					RC_Read(&RC,counter);
 				
 					//      IMU
 					Update_IMU_Data_Mahony(&Mahony,&Mpu);
 
 	
-					//PTAM_get_data(&MPC,&Cam_Position,&Mpu);
-					//Correct_Cam_POS(&Cam_Position);
+					PTAM_get_data(&MPC,&Cam_Position,&Mpu);
+					Correct_Cam_POS(&Cam_Position);
 					
-					do_optical(&MPC,&optical,&Mpu);
 					
 					Nrf_(&NRF,counter);
 				
@@ -228,7 +225,7 @@ int main(void)
 					{	
 						Mpc_Empty_Data(&MPC);
 						//Mpc_Fill_Data(&MPC,3,(int)(Ultra.point*100),(int)(100*Cam_Position.Modified_POS_Z),(int)(10*(Bat_/21.6)));
-						Mpc_Fill_Data(&MPC,2,(int)(Ultra.point),(int)(10*(Bat_/21.6)));
+						Mpc_Fill_Data(&MPC,3,(int)(Ultra.point*100),(int)(Cam_Position.Modified_POS_Z*100),(int)(10*(Bat_/21.6)));
 
 						Mpc_Send_Data(&MPC);						
 						
@@ -236,7 +233,7 @@ int main(void)
 						//HAL_Delay(3);												
 					}		
 				
-				
+					
 					switch(Run_State)
 					{
 						case GROUND_MODE:
@@ -247,8 +244,7 @@ int main(void)
 							Scaling_Cam_POS(&Cam_Position,Ultra.point);							
 							//control_init_();
 							
-						 Motor(MIN_Motor_Speed,0,0,0,0);
-				//		Motor(MIN_Motor_Speed +  RC.Throttle,0,0,0,0);  
+							Motor(MIN_Motor_Speed,0,0,0,0);
 							break;
 						//*************************************************************************************
 						case READY_2_FLY:
@@ -266,7 +262,6 @@ int main(void)
 							
 						
 							Motor(RDY_Motor_Speed,0,0,0,0);
-					//	Motor( MIN_Motor_Speed,0,0,0,0);  //**//   
 							
 							break;
 						//*************************************************************************************
@@ -298,9 +293,7 @@ int main(void)
 							//Third_Person_control(&Roll,&Pitch,&Yaw);	
 								
 							// ** Attention **// This programm Change Altitude_Velocity Set point if THR_CUT Enable
-							//**Position_Control(&Position,&Roll,&Pitch,&Yaw);
-							//Velocity_Control(&Velocity,&Roll,&Pitch);
-		
+							Position_Control(&Position,&Roll,&Pitch,&Yaw);
 							
 							Control(&Roll);
 							Control(&Pitch);
@@ -310,13 +303,8 @@ int main(void)
 							//Control_Altitude(RC.RC_SW);																					
 							Control_Altitude_Velocity(RC.RC_SW);									
 								
-				
-
-               
-						 Motor( Motor_force + RDY_Motor_Speed + Initial_Mass_Force ,Roll.Out,Pitch.Out,Yaw.Out,0);  //**// 
-	          // Motor( MIN_Motor_Speed,0,0,0,0);					 
-					 //  Motor( 2000,0,0,0,0);  //**// 	
-								//Servo_Set_Angle(&htim14,(int)(90.0f*(RC.HOV_PIT)));
+							Motor( Motor_force + RDY_Motor_Speed + Initial_Mass_Force ,Roll.Out,Pitch.Out,Yaw.Out,0);  //**// 
+							//Servo_Set_Angle(&htim14,(int)(90.0f*(RC.HOV_PIT)));
 							
 							break;
 						//*************************************************************************************
@@ -502,7 +490,7 @@ void MX_UART4_Init(void)
 {
 
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 57600;
+  huart4.Init.BaudRate = 115200;
   huart4.Init.WordLength = UART_WORDLENGTH_8B;
   huart4.Init.StopBits = UART_STOPBITS_1;
   huart4.Init.Parity = UART_PARITY_NONE;

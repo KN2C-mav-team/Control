@@ -1,5 +1,4 @@
 #include "IMU.h"
-#include "Control.h"
 
 _IMU Mahony;
 
@@ -30,47 +29,23 @@ void update_Accel_weight(_IMU *IMU,MPU_SENSOR *sen)
     sen->g_print=sen->last_g_print+(DT / ( FILTER_G_PRINT + DT)) * (sen->g_print-sen->last_g_print);                
               
     sen->last_g_print=sen->g_print;  
-	
-	
-	if ( Yaw.flag == 0 ){    // moj
 
-
-																	if(sen->g_print < 0.016f)
-																						IMU->Accel_weight=1.2f;  
-																	else if(sen->g_print < 0.019f)
-																						IMU->Accel_weight=0.8f;          
-																	else if(sen->g_print < 0.027f)
-																						IMU->Accel_weight=0.25f; 
-																	else if(sen->g_print < 0.029f)
-																						IMU->Accel_weight=0.05f; 
-																	else if(sen->g_print < 0.031f)
-																						IMU->Accel_weight=0.005f; 
-																	else if(sen->g_print < 0.5f)
-																						IMU->Accel_weight=0.00005f;      
-																	else if(sen->g_print < 0.6f)
-																						IMU->Accel_weight=0.000001f;
-																	else
-																						IMU->Accel_weight=0.0000001f;
-																}		
-	if (Yaw.flag == 1){         // moj
-		
-																			if(sen->g_print < 0.006f)
-																								IMU->Accel_weight=1.2f;  
-																			else if(sen->g_print < 0.009f)
-																								IMU->Accel_weight=0.8f;          
-																			else if(sen->g_print < 0.014f)
-																								IMU->Accel_weight=0.25f; 
-																			else if(sen->g_print < 0.018f)
-																								IMU->Accel_weight=0.05f; 
-																			else if(sen->g_print < 0.021f)
-																								IMU->Accel_weight=0.005f; 
-																			else if(sen->g_print < 0.023f)
-																								IMU->Accel_weight=0.00005f;      
-																			else if(sen->g_print < 0.026f)
-																								IMU->Accel_weight=0.000001f;
-																			else
-																								IMU->Accel_weight=0.0000001f;  
-																		} 
+    if(sen->g_print < 0.007f)
+              IMU->Accel_weight=1.2f;  
+    else if(sen->g_print < 0.010f)
+              IMU->Accel_weight=0.8f;          
+    else if(sen->g_print < 0.017f)
+              IMU->Accel_weight=0.25f; 
+    else if(sen->g_print < 0.021f)
+              IMU->Accel_weight=0.05f; 
+    else if(sen->g_print < 0.024f)
+              IMU->Accel_weight=0.005f; 
+    else if(sen->g_print < 0.5f)
+              IMU->Accel_weight=0.00005f;      
+    else if(sen->g_print < 0.6f)
+              IMU->Accel_weight=0.000001f;
+    else
+              IMU->Accel_weight=0.0000001f;  
               
 }
 
@@ -93,8 +68,8 @@ void Update_Euler_angles(_IMU *IMU,MPU_SENSOR *sen)
 		  IMU->Twokp_Y++; 
           
 
-		IMU->last_Yaw   = IMU->Yaw;
 		
+		IMU->last_Yaw   = IMU->Yaw;
 		
 		IMU->Yaw = 360*IMU->Twokp_Y + IMU->Yaw;
 		IMU->last_Roll  = IMU->Roll;

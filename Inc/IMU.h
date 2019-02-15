@@ -32,9 +32,6 @@
 	 
 	 float Y_twokp;
 	 float Earth_acc_x,Earth_acc_y,Earth_acc_z;
-	 
-	 int   yaw_flag_for_return;
-	 float diff_yaw;
 	 	 
 }_IMU;
 

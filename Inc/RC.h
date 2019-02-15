@@ -6,15 +6,12 @@
 #include "EEPROM.h"
 
 
-#define RC_I2C_Err         1
-#define RC_Invalid_Data    2
-
-#define Throttle_range     400 //400
+#define Throttle_range     400
 #define angle_range        (20.0f)
 
 
-#define Roll_offset        -4
-#define Pitch_offset       -11
+#define Roll_offset        0
+#define Pitch_offset       -10.5
 
 #define YawThreshold       2
 #define RC_noise           2000  //**//
@@ -24,14 +21,14 @@
 
 
 //channel define
-#define Throttle_channel  6         //0      6
-#define Roll_channel      5         //2        5
-#define Pitch_channel     7         //1        7
-#define Yaw_channel       4         //3        4
-#define RC_SW_channel     2          //4       2 
-#define HOV_THR_channel   1          //5        1
-#define RC_TRIM_channel   0           //7      0
-#define HOV_PIT_channel   3          //6       3
+#define Throttle_channel    6
+#define Roll_channel        5
+#define Pitch_channel       7
+#define Yaw_channel         4
+#define RC_SW_channel       2
+#define HOV_THR_channel     1
+#define RC_TRIM_channel     0
+#define HOV_PIT_channel     3 
 
 
 typedef struct 
@@ -50,8 +47,7 @@ typedef struct
 	float HOV_PIT;
 	uint16_t State;
 	uint8_t  init;
-	uint8_t  fail;
-	uint8_t  Invalid_Data_counter;
+	uint8_t fail;
 	I2C_HandleTypeDef I2C;
 	
 	

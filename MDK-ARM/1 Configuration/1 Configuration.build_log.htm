@@ -3,96 +3,28 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: µVision V5.14.0.0
-Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: mojtaba ahangar, kntu, LIC=S5IDY-IAZU5-MQY0F-6Q08M-9KMD6-R6BQD
+IDE-Version: µVision V5.12.0.0
+Copyright (C) 2014 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: FRH Microsoft, Microsoft, LIC=KRMWF-6YLNB-56EQ2-9G7QS-0GQ9R-6D7XM
  
 Tool Versions:
-Toolchain:       MDK-ARM Professional  Version: 5.14.0.0
-Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
-C Compiler:      Armcc.exe V5.05 update 1 (build 106)
-Assembler:       Armasm.exe V5.05 update 1 (build 106)
-Linker/Locator:  ArmLink.exe V5.05 update 1 (build 106)
-Library Manager: ArmAr.exe V5.05 update 1 (build 106)
-Hex Converter:   FromElf.exe V5.05 update 1 (build 106)
-CPU DLL:         SARMCM3.DLL V5.14.0.0
-Dialog DLL:      DCM.DLL V1.13.1.0
-Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V2.0.14.0_KEIL
-Dialog DLL:      TCM.DLL V1.14.4.0
+Toolchain:       MDK-ARM Standard  Version: <unknown>
+Toolchain Path:  C:\Keil\ARM\ARMCC\bin\
+C Compiler:      Armcc.exe V5.05 (build 41)
+Assembler:       Armasm.exe V5.05 (build 41)
+Linker/Locator:  ArmLink.exe V5.05 (build 41)
+Library Manager: ArmAr.exe V5.05 (build 41)
+Hex Converter:   FromElf.exe V5.05 (build 41)
+CPU DLL:         SARMCM3.DLL
+Dialog DLL:      DCM.DLL
+    Target DLL: STLink\ST-LINKIII-KEIL_SWO.dll
+Dialog DLL:      TCM.DLL
  
 <h2>Project:</h2>
-E:\robotic\quade mah\moj\project files\sharif-cup2015 presentation\code\MDK-ARM\1.uvprojx
-Project File Date:  09/12/2015
+C:\Users\FRH_MD\Desktop\Quad\Vnow\MDK-ARM\1.uvprojx
+Project File Date:  04/11/2015
 
 <h2>Output:</h2>
-Build target '1 Configuration'
-compiling main.c...
-..\Inc\Optical_Flow.h(60): warning:  #1295-D: Deprecated declaration optical_kalman_init - give arg types
-  void optical_kalman_init();
-..\Inc\Optical_Flow.h(68): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Src\main.c(898): warning:  #188-D: enumerated type mixed with another type
-                                        LEDB_OFF;               
-..\Src\main.c(907): warning:  #188-D: enumerated type mixed with another type
-                                        LEDB_OFF;               
-..\Src\main.c(922): warning:  #188-D: enumerated type mixed with another type
-        else LEDY_OFF;
-..\Src\main.c(936): warning:  #188-D: enumerated type mixed with another type
-                        LEDW_ON;
-..\Src\main.c(937): warning:  #188-D: enumerated type mixed with another type
-                else LEDW_OFF;          
-..\Src\main.c(946): warning:  #188-D: enumerated type mixed with another type
-                        LEDW_ON;
-..\Src\main.c(947): warning:  #188-D: enumerated type mixed with another type
-                else LEDW_OFF;
-..\Src\main.c(1004): warning:  #188-D: enumerated type mixed with another type
-        LEDY_OFF;
-..\Src\main.c(1005): warning:  #188-D: enumerated type mixed with another type
-        LEDG_OFF;
-..\Src\main.c(1006): warning:  #188-D: enumerated type mixed with another type
-        LEDB_OFF;
-..\Src\main.c(1007): warning:  #188-D: enumerated type mixed with another type
-        LEDW_OFF;
-..\Src\main.c: 13 warnings, 0 errors
-compiling Control.c...
-..\Inc\Optical_Flow.h(60): warning:  #1295-D: Deprecated declaration optical_kalman_init - give arg types
-  void optical_kalman_init();
-..\Inc\Optical_Flow.h(68): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Src\Control.c(682): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-        Velocity.X.diff_point= (Velocity.X.point - Velocity.X.last_point)/0.004;
-..\Src\Control.c(687): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-        Velocity.Y.diff_point= (Velocity.Y.point - Velocity.Y.last_point)/0.004;
-..\Src\Control.c: 4 warnings, 0 errors
-compiling IMU.c...
-compiling NRF.c...
-..\Inc\Optical_Flow.h(60): warning:  #1295-D: Deprecated declaration optical_kalman_init - give arg types
-  void optical_kalman_init();
-..\Inc\Optical_Flow.h(68): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Src\NRF.c: 2 warnings, 0 errors
-compiling RC.c...
-..\Inc\Optical_Flow.h(60): warning:  #1295-D: Deprecated declaration optical_kalman_init - give arg types
-  void optical_kalman_init();
-..\Inc\Optical_Flow.h(68): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Src\RC.c: 2 warnings, 0 errors
-compiling Telemetri.c...
-..\Inc\Optical_Flow.h(60): warning:  #1295-D: Deprecated declaration optical_kalman_init - give arg types
-  void optical_kalman_init();
-..\Inc\Optical_Flow.h(68): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\Src\Telemetri.c: 2 warnings, 0 errors
-linking...
-Program Size: Code=50028 RO-data=1204 RW-data=132 ZI-data=5972  
-FromELF: creating hex file...
-"1 Configuration\1 Configuration.axf" - 0 Error(s), 23 Warning(s).
-
-<h2>Collection of Component include folders:</h2>
-  E:\robotic\quade mah\moj\project files\sharif-cup2015 presentation\code\MDK-ARM\RTE
-  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
-
-<h2>Collection of Component Files used:</h2>
 </pre>
 </body>
 </html>

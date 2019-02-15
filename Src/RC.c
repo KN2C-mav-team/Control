@@ -20,10 +20,10 @@ void RC_Read(_RC* Rc,int State)
 						Rc->RC_channel[i] = con.real;
 					}
 				RC_2_SetPoint(Rc);
-
+				Rc->fail =0;
 		}	
 		else
-				Rc->fail =RC_I2C_Err;
+				Rc->fail =1;
 			
 	}
 	
@@ -31,80 +31,38 @@ void RC_Read(_RC* Rc,int State)
 
 void RC_2_SetPoint(_RC* Rc)
 {	
-	char channel_err=0;
-	
 	if( ( Rc->RC_channel[Throttle_channel] > (Rc->channel_offset[Throttle_channel] - RC_noise) ) && ( (Rc->RC_channel[Throttle_channel]) < (Rc->channel_offset[Throttle_channel] + Rc->channel_scale[Throttle_channel] + RC_noise ) ) )
 				Rc->Throttle = Throttle_range*((float)(Rc->RC_channel[Throttle_channel]-Rc->channel_offset[Throttle_channel])/((float)Rc->channel_scale[Throttle_channel]));
-	else
-		channel_err+=1;
-	
 	
 	if( ( Rc->RC_channel[Roll_channel] > (Rc->channel_offset[Roll_channel]  - RC_noise) ) &&  ( (Rc->RC_channel[Roll_channel]) < (Rc->channel_offset[Roll_channel] + Rc->channel_scale[Roll_channel]+ RC_noise ) ) )
 		{
 				Rc->Roll=2*angle_range*(((float)(Rc->RC_channel[Roll_channel]-Rc->channel_offset[Roll_channel])/(float)Rc->channel_scale[Roll_channel])-0.5f);
 				Rc->Roll+=Roll_offset;                                                               
 		}
-	else
-		channel_err+=1;	
-	
-	
+				
 	if( ( Rc->RC_channel[Pitch_channel] > (Rc->channel_offset[Pitch_channel] - RC_noise)) && ( Rc->RC_channel[Pitch_channel] < (Rc->channel_offset[Pitch_channel] + Rc->channel_scale[Pitch_channel]+ RC_noise) ) )
 		{
 				Rc->Pitch= -2*angle_range*(((float)(Rc->RC_channel[Pitch_channel]-Rc->channel_offset[Pitch_channel])/(float)Rc->channel_scale[Pitch_channel])-0.5f);
 				Rc->Pitch+=Pitch_offset;                  
 		}
-	else
-		channel_err+=1;	
-	
-	
+				
 	if( (Rc->RC_channel[Yaw_channel] >Rc->channel_offset[Yaw_channel] - RC_noise) && (Rc->RC_channel[Yaw_channel] < Rc->channel_offset[Yaw_channel] + Rc->channel_scale[Yaw_channel]+ RC_noise))
         Rc->Yaw=angle_range*(((float)(Rc->RC_channel[Yaw_channel]-Rc->channel_offset[Yaw_channel])/(float)Rc->channel_scale[Yaw_channel])-0.5f);
-	else
-		channel_err+=1;
-	
 	
 //	if(Rc->RC_channel[HOV_PIT_channel] > Rc->channel_offset[HOV_PIT_channel]  - RC_noise && Rc->RC_channel[HOV_PIT_channel] < Rc->channel_offset[HOV_PIT_channel] + Rc->channel_scale[HOV_PIT_channel]+ RC_noise)    
 //				Rc->THR_CUT=(((float)(Rc->RC_channel[HOV_PIT_channel]-Rc->channel_offset[HOV_PIT_channel])/(float)Rc->channel_scale[HOV_PIT_channel]));       
 	
 	if(Rc->RC_channel[RC_SW_channel] > Rc->channel_offset[RC_SW_channel]  - RC_noise && Rc->RC_channel[RC_SW_channel] < Rc->channel_offset[RC_SW_channel] + Rc->channel_scale[RC_SW_channel]+ RC_noise)
 				Rc->RC_SW=(((float)(Rc->RC_channel[RC_SW_channel]-Rc->channel_offset[RC_SW_channel])/(float)Rc->channel_scale[RC_SW_channel]));
-	else
-		channel_err+=1;
-	
 	
 	if(Rc->RC_channel[HOV_THR_channel] > Rc->channel_offset[HOV_THR_channel]  - RC_noise && Rc->RC_channel[HOV_THR_channel] < Rc->channel_offset[HOV_THR_channel] + Rc->channel_scale[HOV_THR_channel]+ RC_noise)
 				Rc->HOV_THR=((float)(Rc->RC_channel[HOV_THR_channel]-Rc->channel_offset[HOV_THR_channel])/(float)Rc->channel_scale[HOV_THR_channel]);
-	else
-		channel_err+=1;
-	
 	
 	if(Rc->RC_channel[RC_TRIM_channel] > Rc->channel_offset[RC_TRIM_channel]  - RC_noise && Rc->RC_channel[RC_TRIM_channel] < Rc->channel_offset[RC_TRIM_channel] + Rc->channel_scale[RC_TRIM_channel]+ RC_noise)
 			  Rc->RC_TRIM=(((float)(Rc->RC_channel[RC_TRIM_channel]-Rc->channel_offset[RC_TRIM_channel])/(float)Rc->channel_scale[RC_TRIM_channel])); 
-	else
-		channel_err+=1;
-	
 	
 	if(Rc->RC_channel[HOV_PIT_channel] > Rc->channel_offset[HOV_PIT_channel]  - RC_noise && Rc->RC_channel[HOV_PIT_channel] < Rc->channel_offset[HOV_PIT_channel] + Rc->channel_scale[HOV_PIT_channel] + RC_noise)
 				Rc->HOV_PIT=((float)(Rc->RC_channel[HOV_PIT_channel]-Rc->channel_offset[HOV_PIT_channel])/(float)Rc->channel_scale[HOV_PIT_channel]);
-	else
-		channel_err+=1;
-	
-	
-	if(channel_err > 4)
-		Rc->Invalid_Data_counter += 1;
-	else
-		Rc->Invalid_Data_counter =  0;
-	
-	
-	
-	if(Rc->Invalid_Data_counter > 4)
-	{
-		Rc->fail = RC_Invalid_Data;
-		Rc->Invalid_Data_counter =5;
-	}
-	else
-		Rc->fail =  0;
-	
 	
 	
 	Rc->RC_SW   = (Rc->RC_SW> 0.5f )? 1 : 0;    

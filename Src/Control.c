@@ -1,7 +1,6 @@
 #include "Control.h"
 #include "define.h"
 #include "Kalman.h"
-#include "Optical_Flow.h"
 
 int kooft=0;
 int frq;
@@ -15,10 +14,8 @@ System_Status Pitch;
 System_Status Yaw;
 System_Status Altitude;
 System_Status Altitude_Velocity;
-System_Status Altitude_take_off;
 
 _3D_Vector Position;
-_3D_Vector Velocity;
 
 int Alt_Control_run=FALSE;
 int Alt_Setpoint_state=0;
@@ -26,9 +23,6 @@ int Throttle_bias=0,Motor_force=0;
 float On_Ground_Altitude=0;
 
 int position_error=0;
-
-int MRU,MLU,MRD,MLD;
-int last_MRU,last_MLU,last_MRD,last_MLD;
 
 
 void Pwm_frq(TIM_HandleTypeDef* _htim , int _frq, int _resolution)
@@ -82,18 +76,9 @@ void Pwm_set(TIM_HandleTypeDef* _htim,int _pwm,int Motor_num)
 
 void Rc2Controller(_RC Rc)
 {
-	Yaw.setpoint   =  (Rc.Yaw/15.0f) + Yaw.setpoint; 
-	Yaw.sorat_taghirat = (Yaw.setpoint - Yaw.last_setpoint )/DT;  // moj
-	Yaw.last_setpoint = Yaw.setpoint ; 	                      // moj
-	if ( fabs(Yaw.sorat_taghirat) > 40 ){
-																				Yaw.flag = 1;
-																			} 
-	if ( fabs(Yaw.sorat_taghirat) <= 40 ){
-																				Yaw.flag = 0;
-																			}
-		
-	Roll.setpoint  =  Rc.Pitch;
-	Pitch.setpoint = -1 * Rc.Roll;		
+	Yaw.setpoint   =  -(Rc.Yaw/15.0f) + Yaw.setpoint;  
+	Roll.setpoint  =  Rc.Roll;
+	Pitch.setpoint =  Rc.Pitch;		
 }
 
 
@@ -184,13 +169,11 @@ int Control(System_Status *In)
 void control_init_(void)
 {
 	  Roll.Kp=(float)EEPROM_Read_int16_t(EEPROM_Roll_Kp) / 10.0f ;
-	//Roll.Ki=(float)EEPROM_Read_int16_t(EEPROM_Roll_Ki) / 10.0f ;
-	  Roll.Ki=0;
-   	Roll.Kd=(float)EEPROM_Read_int16_t(EEPROM_Roll_Kd) / 10.0f ;	
+		Roll.Ki=(float)EEPROM_Read_int16_t(EEPROM_Roll_Ki) / 10.0f ;
+		Roll.Kd=(float)EEPROM_Read_int16_t(EEPROM_Roll_Kd) / 10.0f ;	
 
 		Pitch.Kp=(float)EEPROM_Read_int16_t(EEPROM_Pitch_Kp) / 10.0f ;
-		//Pitch.Ki=(float)EEPROM_Read_int16_t(EEPROM_Pitch_Ki) / 10.0f ;
-  	Pitch.Ki = 0;
+		Pitch.Ki=(float)EEPROM_Read_int16_t(EEPROM_Pitch_Ki) / 10.0f ;
 		Pitch.Kd=(float)EEPROM_Read_int16_t(EEPROM_Pitch_Kd) / 10.0f ;
 			
 		Yaw.Kp=(float)EEPROM_Read_int16_t(EEPROM_Yaw_Kp) / 10.0f ;
@@ -208,15 +191,7 @@ void control_init_(void)
 		Altitude_Velocity.Kp_save=(float)EEPROM_Read_int16_t(EEPROM_Altitude_Velocity_Kp) / 10.0f ;		//**//
 		Altitude_Velocity.Ki_save=(float)EEPROM_Read_int16_t(EEPROM_Altitude_Velocity_Ki) / 10.0f ;		//**//
 		Altitude_Velocity.Kd_save=(float)EEPROM_Read_int16_t(EEPROM_Altitude_Velocity_Kd) / 10.0f ;		//**//
-		
-		Altitude_take_off.Kp_save=(float)EEPROM_Read_int16_t(EEPROM_Altitude_take_off_Kp) / 10.0f ;		//moj
-		Altitude_take_off.Ki_save=(float)EEPROM_Read_int16_t(EEPROM_Altitude_take_off_Ki) / 10.0f ;		//moj
-		Altitude_take_off.Kd_save=(float)EEPROM_Read_int16_t(EEPROM_Altitude_take_off_Kd) / 10.0f ;		//moj
 
-		Altitude_take_off.Kp=Altitude_take_off.Kp_save;		//**//
-		Altitude_take_off.Ki=Altitude_take_off.Ki_save;		//**//
-		Altitude_take_off.Kd=Altitude_take_off.Kd_save;		//**//
-		
 		Altitude_Velocity.Kp=Altitude_Velocity.Kp_save;		//**//
 		Altitude_Velocity.Ki=Altitude_Velocity.Ki_save;		//**//
 		Altitude_Velocity.Kd=Altitude_Velocity.Kd_save;		//**//
@@ -226,13 +201,9 @@ void control_init_(void)
 		Position.X.Ki=(float)EEPROM_Read_int16_t(EEPROM_Position_Ki) / 100.0f ;
 		Position.X.Kd=(float)EEPROM_Read_int16_t(EEPROM_Position_Kd) / 100.0f ;
 	
-		Velocity.X.Kp=(float)EEPROM_Read_int16_t(EEPROM_opti_x_Kp) / 100.0f ;
-		Velocity.X.Ki=(float)EEPROM_Read_int16_t(EEPROM_opti_x_Ki) / 100.0f ;
-		Velocity.X.Kd=(float)EEPROM_Read_int16_t(EEPROM_opti_x_Kd) / 100.0f ;
-		
-		Velocity.Y.Kp=(float)EEPROM_Read_int16_t(EEPROM_opti_y_Kp) / 100.0f ;
-		Velocity.Y.Ki=(float)EEPROM_Read_int16_t(EEPROM_opti_y_Ki) / 100.0f ;
-		Velocity.Y.Kd=(float)EEPROM_Read_int16_t(EEPROM_opti_y_Kd) / 100.0f ;
+		Position.Y.Kp=(float)EEPROM_Read_int16_t(EEPROM_Position_Kp) / 100.0f ;
+		Position.Y.Ki=(float)EEPROM_Read_int16_t(EEPROM_Position_Ki) / 100.0f ;
+		Position.Y.Kd=(float)EEPROM_Read_int16_t(EEPROM_Position_Kd) / 100.0f ;
 	
 	
 	  if(((unsigned int)Roll.Kp > Roll_P_coefficient)   || ((unsigned int)Roll.Ki > Roll_I_coefficient) 	|| ((unsigned int)Roll.Kd > Roll_D_coefficient) )	
@@ -261,8 +232,8 @@ void control_init_(void)
 		Pitch.Max=Roll.Max;
 		Pitch.Min=Roll.Min;
 		Pitch.Plimit=Roll.Plimit;
-		Pitch.Ilimit=Roll.Ilimit;
-		Pitch.Dlimit=Roll.Dlimit;
+		Pitch.Dlimit=Roll.Ilimit;
+		Pitch.Ilimit=Roll.Dlimit;
 
 
 		Yaw.Max=300;
@@ -293,35 +264,13 @@ void control_init_(void)
 		Position.Y.Min=Position.X.Min;
 		Position.Y.Plimit=Position.X.Plimit;
 		Position.Y.Dlimit=Position.X.Dlimit;
-		Position.Y.Ilimit=Position.X.Ilimit;
-		
-		Velocity.X.Max = 11;
-		Velocity.X.Min = -11;
-		Velocity.X.Plimit = 7;
-		Velocity.X.Ilimit = 11;
-		Velocity.X.Dlimit = 6;
-		
-		Velocity.Y.Max = Velocity.X.Max;
-		Velocity.Y.Min = Velocity.X.Min;
-		Velocity.Y.Plimit = Velocity.X.Plimit;
-		Velocity.Y.Ilimit = Velocity.X.Ilimit;
-		Velocity.Y.Dlimit = Velocity.X.Dlimit;
-		
-		
-		
-		Altitude_take_off.Max=25;
-		Altitude_take_off.Min=-25;
-		Altitude_take_off.Plimit=25;
-		Altitude_take_off.Dlimit=0;
-		Altitude_take_off.Ilimit=20;
-		
-		
+		Position.Y.Ilimit=Position.X.Ilimit;			
 }
 
 
 void Motor(int Speed,int Roll_in,int Pitch_in,int Yaw_in,int W)
 {
-
+	int MRU,MLU,MRD,MLD;
 
 //Speed=Speed*0.5*(4-cos(Roll.point)-cos(Pitch.point));
 //Speed=Speed*0.5*(1/cos(Roll.point)+1/cos(Pitch.point));
@@ -365,26 +314,11 @@ void Motor(int Speed,int Roll_in,int Pitch_in,int Yaw_in,int W)
 // 	    /					     \
 // 	 MLD					  	MRD	 
 
- /*low_pass on signal_out*/
- 
+	MRU	=Speed-(Roll_in/4)+(Pitch_in/4)-(Yaw_in/2);
+	MLU	=Speed+(Roll_in/4)+(Pitch_in/4)+(Yaw_in/2);
 
-
-	MRU	=Speed-(Roll_in/4)+(Pitch_in/4)+(Yaw_in/2);
-	MLU	=Speed+(Roll_in/4)+(Pitch_in/4)-(Yaw_in/2);
-
-	MRD	=Speed-(Roll_in/4)-(Pitch_in/4)-(Yaw_in/2);
-	MLD	=Speed+(Roll_in/4)-(Pitch_in/4)+(Yaw_in/2);
-	
-//	MRU = last_MRU + (DT/(DT+FILTER_output_signal_motor)) * ( MRU - last_MRU );  //MOJ
-//  MLU = last_MLU + (DT/(DT+FILTER_output_signal_motor)) * ( MLU - last_MLU );
-//	MRD = last_MRD + (DT/(DT+FILTER_output_signal_motor)) * ( MRD - last_MRD );
-//	MLD = last_MLD + (DT/(DT+FILTER_output_signal_motor)) * ( MLD - last_MLD );
-//	
-//	last_MRU = MRU; //MOJ
-//	last_MLU = MLU;
-//	last_MRD = MRD;
-//	last_MLD = MLD;
-	
+	MRD	=Speed-(Roll_in/4)-(Pitch_in/4)+(Yaw_in/2);
+	MLD	=Speed+(Roll_in/4)-(Pitch_in/4)-(Yaw_in/2);
 	
 	
 //	
@@ -495,21 +429,6 @@ void Read_Gain(int Mode,int *pdata)
 			pdata[1]=EEPROM_Read_int16_t(EEPROM_Position_Ki);
 			pdata[2]=EEPROM_Read_int16_t(EEPROM_Position_Kd);
 			break;
-		case _opti_x_gain:
-			pdata[0]=EEPROM_Read_int16_t(EEPROM_opti_x_Kp);
-			pdata[1]=EEPROM_Read_int16_t(EEPROM_opti_x_Ki);
-			pdata[2]=EEPROM_Read_int16_t(EEPROM_opti_x_Kd);
-			break;
-		case _opti_y_gain:
-			pdata[0]=EEPROM_Read_int16_t(EEPROM_opti_y_Kp);
-			pdata[1]=EEPROM_Read_int16_t(EEPROM_opti_y_Ki);
-			pdata[2]=EEPROM_Read_int16_t(EEPROM_opti_y_Kd);
-			break;
-		case _Altitude_take_off_gain:
-			pdata[0]=EEPROM_Read_int16_t(EEPROM_Altitude_take_off_Kp);
-			pdata[1]=EEPROM_Read_int16_t(EEPROM_Altitude_take_off_Ki);
-			pdata[2]=EEPROM_Read_int16_t(EEPROM_Altitude_take_off_Kd);
-			break;
 	}
 }
 
@@ -558,21 +477,6 @@ void Set_Gain(int Mode,int *pdata)
 			EEPROM_Write_int16_t(EEPROM_Position_Ki,pdata[1]);
 			EEPROM_Write_int16_t(EEPROM_Position_Kd,pdata[2]);
 			break;
-		case _opti_x_gain:
-			EEPROM_Write_int16_t(EEPROM_opti_x_Kp,pdata[0]);
-			EEPROM_Write_int16_t(EEPROM_opti_x_Ki,pdata[1]);
-			EEPROM_Write_int16_t(EEPROM_opti_x_Kd,pdata[2]);
-			break;
-		case _opti_y_gain:
-			EEPROM_Write_int16_t(EEPROM_opti_y_Kp,pdata[0]);
-			EEPROM_Write_int16_t(EEPROM_opti_y_Ki,pdata[1]);
-			EEPROM_Write_int16_t(EEPROM_opti_y_Kd,pdata[2]);
-			break;
-		case _Altitude_take_off_gain:
-			EEPROM_Write_int16_t(EEPROM_Altitude_take_off_Kp,pdata[0]);
-			EEPROM_Write_int16_t(EEPROM_Altitude_take_off_Ki,pdata[1]);
-			EEPROM_Write_int16_t(EEPROM_Altitude_take_off_Kd,pdata[2]);
-			break;
 	}
 }
 
@@ -609,8 +513,6 @@ void Set_zero_system_state(void)
 			Altitude_Velocity.Out=0;				
 			Altitude_Velocity.Out_bias=0;
 			
-			
-			
 			Alt_Setpoint_state=0;				
 			Throttle_bias=0;
 			Motor_force=0;
@@ -625,26 +527,23 @@ void Set_zero_system_state(void)
 			position_error=0;
 			
 			On_Ground_Altitude=Altitude.point;
-			
-			Velocity.X.integral_err = 0;
-			Velocity.Y.integral_err = 0;
 }
 
 
 void Point2Controller(_IMU IMU,MPU_SENSOR Mpu)
 {
 	Yaw.last_point = Yaw.point;
-	Yaw.point = -1 * IMU.Yaw;
+	Yaw.point = IMU.Yaw;
 	
 	Roll.last_point = Roll.point;
-	Roll.point = -1 *  IMU.Pitch;
+	Roll.point = -1 *  IMU.Roll;
 	
 	Pitch.last_point = Pitch.point;
-	Pitch.point = 1 *  IMU.Roll;
+	Pitch.point = -1 *  IMU.Pitch;
 	
-	Roll.diff_point      = -1 *    ToDeg(Mpu.gyro_x);
-  Pitch.diff_point     =  1 *    ToDeg(Mpu.gyro_y);
-  Yaw.diff_point       = -1 *    ToDeg(Mpu.gyro_z);		
+	Roll.diff_point      = -1 *    ToDeg(Mpu.gyro_y);
+  Pitch.diff_point     = -1 *    ToDeg(Mpu.gyro_x);
+  Yaw.diff_point       =  1 *    ToDeg(Mpu.gyro_z);		
 	
 //	if(Ultra.point>=50)
 //	{
@@ -676,16 +575,6 @@ void Point2Controller(_IMU IMU,MPU_SENSOR Mpu)
 		Position.X.diff_point = 0;
 		Position.Y.diff_point = 0;		
 	}
-	
-	Velocity.X.setpoint=0;
-	Velocity.X.point = -x_vel.state ;
-	Velocity.X.diff_point= (Velocity.X.point - Velocity.X.last_point)/0.004;
-	Velocity.X.last_point = Velocity.X.point ;
-	
-	Velocity.Y.setpoint=0;
-	Velocity.Y.point = -y_vel.state;	
-	Velocity.Y.diff_point= (Velocity.Y.point - Velocity.Y.last_point)/0.004;
-	Velocity.Y.last_point = Velocity.Y.point ;
 }
 
 
@@ -784,19 +673,9 @@ void Control_Altitude_Velocity(int Alt_Control_SW)
 			// Auto Take-oFF
 			if( RC.THR_CUT == 1)
 			{
-				
-//				Altitude_take_off.point = Altitude.point;
-//				Altitude_take_off.setpoint = ALTITUDE_TAKE_OFF_MAX;
-//				Control(&Altitude_take_off);
-//				Altitude_Velocity.setpoint = Altitude_take_off.Out;
-//				
-				Altitude_Velocity.setpoint=(ALTITUDE_TAKE_OFF_MAX - Altitude.point);
+				Altitude_Velocity.setpoint=(65.0f - Altitude.point);
 				if(Altitude_Velocity.setpoint >= 25)	Altitude_Velocity.setpoint=25;
-				if(Altitude_Velocity.setpoint <= -25)	Altitude_Velocity.setpoint=-25;
-				
-			
-
-					
+				if(Altitude_Velocity.setpoint <= -25)	Altitude_Velocity.setpoint=-25;				
 			}
 			else 
 			{
@@ -834,8 +713,7 @@ void Control_Altitude_Velocity(int Alt_Control_SW)
 					if(Altitude.point >= Max_Altitude_Range) 	
 						Altitude_Velocity.setpoint= Max_Altitude_Range - Altitude.point;
 			}				
-//			if( Ultra.K_point > ALTITUDE_LIMIT  &&  Altitude_Velocity.setpoint >= 0 ) Altitude_Velocity.setpoint = (ALTITUDE_LIMIT - Ultra.K_point)/50;			
-			if( Ultra.K_point > ALTITUDE_LIMIT  &&  Altitude_Velocity.setpoint >= 0 ) Altitude_Velocity.setpoint = 0;	
+						
 			Control(&Altitude_Velocity);
 			
 			if( (Altitude_Velocity.Out + Altitude_Velocity.Out_bias) >= 0 )
@@ -925,35 +803,6 @@ void Position_Control(_3D_Vector *Position,System_Status *_Roll,System_Status *_
 			Position->Y.Out = 0;
 			Position->Y.Out_float = 0;
 			Position->Y.integral_err = 0;			
-	}
-}
-void Velocity_Control(_3D_Vector *Velocity,System_Status *_Roll,System_Status *_Pitch)
-{		
-	// Run Controller
-	if( (RC.THR_CUT ==1)  &&  (Altitude.point>15) )
-	{
-			Control(&Velocity->X);	
-			Control(&Velocity->Y);
-		
-	  	Velocity->Y.Out_float = Velocity->Y.last_Out_float + ( DT / DT + FILTER_velocity_y_optical ) * ( Velocity->Y.Out_float - Velocity->Y.last_Out_float);
-      Velocity->X.Out_float = Velocity->X.last_Out_float + ( DT / DT + FILTER_velocity_x_optical ) * ( Velocity->X.Out_float - Velocity->X.last_Out_float);
-		
-	  	_Roll->setpoint  = _Roll->setpoint + Velocity->X.Out_float;
-	 		_Pitch->setpoint = _Pitch->setpoint + Velocity->Y.Out_float;
-		
-	  	Velocity->X.last_Out_float = Velocity->X.Out_float;
-	  	Velocity->Y.last_Out_float = Velocity->Y.Out_float;
-		
-	}
-	else
-	{		
-			Velocity->X.Out = 0;
-			Velocity->X.Out_float = 0;
-			Velocity->X.integral_err = 0;
-			
-			Velocity->Y.Out = 0;
-			Velocity->Y.Out_float = 0;
-			Velocity->Y.integral_err = 0;			
 	}
 }
 

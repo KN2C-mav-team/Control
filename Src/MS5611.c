@@ -118,8 +118,8 @@ void MS5611_Read(MS5611 *sen)
 			HAL_I2C_Mem_Read(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_READ,1,(uint8_t *)data,3,1000);
 			sen->D2 = data[0]*256*256 + data[1]*256+data[0];
 			MS5611_calcute(sen);
-			//sen->P=sen->last_P+ (DT / ( FILTER_P + DT)) * (sen->P - sen->last_P);
-			//sen->last_P =sen->P;
+			sen->P=sen->last_P+ (DT / ( FILTER_P + DT)) * (sen->P - sen->last_P);
+			sen->last_P =sen->P;
 			HAL_I2C_Mem_Write(&sen->I2C,ms5607_ADD,ms5607_CMD_ADC_4096 + ms5607_CMD_ADC_D1,1,(uint8_t *)data,1,1000);
 			MS5611_2_Height(sen);
 			sen->station = 1;

@@ -6,7 +6,7 @@
 1 configuration\stm32f4xx_it.o: ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h
 1 configuration\stm32f4xx_it.o: ..\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f407xx.h
 1 configuration\stm32f4xx_it.o: ..\Drivers\CMSIS\Include\core_cm4.h
-1 configuration\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+1 configuration\stm32f4xx_it.o: C:\Keil\ARM\ARMCC\Bin\..\include\stdint.h
 1 configuration\stm32f4xx_it.o: ..\Drivers\CMSIS\Include\core_cmInstr.h
 1 configuration\stm32f4xx_it.o: ..\Drivers\CMSIS\Include\core_cmFunc.h
 1 configuration\stm32f4xx_it.o: ..\Drivers\CMSIS\Include\core_cmSimd.h
@@ -34,10 +34,10 @@
 1 configuration\stm32f4xx_it.o: ..\Inc\stm32f4xx_it.h
 1 configuration\stm32f4xx_it.o: ..\Inc\main.h
 1 configuration\stm32f4xx_it.o: ..\Inc\Define.h
-1 configuration\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+1 configuration\stm32f4xx_it.o: C:\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 1 configuration\stm32f4xx_it.o: ..\Inc\mpu6050.h
 1 configuration\stm32f4xx_it.o: ..\Inc\main.h
-1 configuration\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+1 configuration\stm32f4xx_it.o: C:\Keil\ARM\ARMCC\Bin\..\include\math.h
 1 configuration\stm32f4xx_it.o: ..\Inc\EEPROM.h
 1 configuration\stm32f4xx_it.o: ..\Inc\mpu6050.h
 1 configuration\stm32f4xx_it.o: ..\Inc\Telemetri.h

@@ -20,8 +20,6 @@
 1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma.h
 1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma_ex.h
 1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_cortex.h
-1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h
-1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc_ex.h
 1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash.h
 1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h
 1 configuration\ms5611.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ramfunc.h
@@ -41,5 +39,5 @@
 1 configuration\ms5611.o: ..\..\Inc\mpu6050.h
 1 configuration\ms5611.o: ..\..\Inc\Telemetri.h
 1 configuration\ms5611.o: ..\..\Inc\EEPROM.h
-1 configuration\ms5611.o: ..\..\Inc\Altitude.h
+1 configuration\ms5611.o: ..\..\Inc\Height.h
 1 configuration\ms5611.o: ..\..\Inc\Kalman.h

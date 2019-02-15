@@ -69,19 +69,6 @@
 #define	 EEPROM_Position_Ki								 	 0x004e		//**//
 #define	 EEPROM_Position_Kd								 	 0x0050		//**//
 
-#define	 EEPROM_opti_x_Kp								  	 0x0052		//**//
-#define	 EEPROM_opti_x_Ki								  	 0x0054		//**//
-#define	 EEPROM_opti_x_Kd								  	 0x0056   //**//
-
-#define	 EEPROM_opti_y_Kp								  	 0x0058		//**//
-#define	 EEPROM_opti_y_Ki								  	 0x006a		//**//
-#define	 EEPROM_opti_y_Kd								  	 0x006c   //**//
- 
-#define  EEPROM_Altitude_take_off_Kp				 0x006e   //moj
-#define  EEPROM_Altitude_take_off_Ki				 0x0070   //moj
-#define  EEPROM_Altitude_take_off_Kd				 0x0072   //moj
-
-
 
 
 void EEPROM_Write_Byte(uint16_t RegAdd,uint8_t data);

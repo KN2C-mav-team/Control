@@ -43,14 +43,12 @@ typedef struct {
 	float C;
 	
 	float state;
-	float last_state;
-	float acc_kalman_output;
+	
 	float Ex;
 	float Ez;
 	
 	float P;
 	float K;
-	int need_2_res;
 	
 }_Kalman1x1;
 

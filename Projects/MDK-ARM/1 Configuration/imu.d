@@ -20,8 +20,6 @@
 1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma.h
 1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma_ex.h
 1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_cortex.h
-1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc.h
-1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_adc_ex.h
 1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash.h
 1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h
 1 configuration\imu.o: ..\..\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ramfunc.h
@@ -39,12 +37,7 @@
 1 configuration\imu.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 1 configuration\imu.o: ..\..\Inc\mpu6050.h
 1 configuration\imu.o: ..\..\Inc\Telemetri.h
-1 configuration\imu.o: ..\..\Inc\Altitude.h
+1 configuration\imu.o: ..\..\Inc\Height.h
 1 configuration\imu.o: ..\..\Inc\Telemetri.h
 1 configuration\imu.o: ..\..\Inc\Kalman.h
 1 configuration\imu.o: ..\..\Inc\EEPROM.h
-1 configuration\imu.o: ..\..\Inc\Control.h
-1 configuration\imu.o: ..\..\Inc\RC.h
-1 configuration\imu.o: ..\..\Inc\Odometery.h
-1 configuration\imu.o: ..\..\Inc\MPC.h
-1 configuration\imu.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h

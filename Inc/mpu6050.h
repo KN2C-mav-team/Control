@@ -80,11 +80,11 @@
 
 
 // filter
-#define GyroThreshold           30
+#define GyroThreshold           20
 #define	PI				    3.1415926535f
 
-#define F_CUT_GRAVITY_hpf       4
-#define F_CUT_GRAVITY_lpf       10
+#define F_CUT_GRAVITY_hpf       5
+#define F_CUT_GRAVITY_lpf       15
 #define	F_CUT_G_PRINT 			    100
 #define	F_CUT_ACC			   			  8 
 #define F_CUT_CAM_DIFF					4

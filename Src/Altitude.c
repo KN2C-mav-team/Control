@@ -6,7 +6,6 @@
 _Ultra Ultra;
 float vel_z;
 int start_vel_z_kalman =0;
-int counter_loop=0;
 
 
 
@@ -52,9 +51,7 @@ void Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra)
 	}	
 	if(counter>200 | start_vel_z_kalman == 1)
 	{
-		
-		Vel_z(&z_vel,ultra,0,_htim);			//** For Control Z Position Disable this
-
+		Vel_z(&z_vel,ultra,0);			//** For Control Z Position Disable this
 		start_vel_z_kalman=1;
 	}
 	if(ultra->State == 3)
@@ -112,121 +109,43 @@ void  ultra_filter_lpf(_Ultra* ultra)
 	ultra->last_point= ultra->point;
 }
 
-float Vel_z(_Kalman1x1 *Kalman_state,_Ultra *ultra,float acc,TIM_HandleTypeDef _htim)
+float Vel_z(_Kalman1x1 *Kalman_state,_Ultra *ultra,float acc)
 {
-
-		
 	float ultra_noise=0;
 	float acc_z=Mahony.Earth_acc_z;
 	
-	z_vel.last_state=z_vel.state;
-
+	if(Mahony.Earth_acc_z > 1)
+		acc_z =0;
+	
 	if(ultra->ready == 2)
 	{
 		ultra->ready = 0;	
-  //	ultra->K_point = ultra->K_last_point +(ultra->Diff_Time/(FILTER_Ultra + ultra->Diff_Time))*(ultra->real-ultra->K_last_point);  
 		
-		ultra->K_point=ultra->real;
+		ultra->K_point = ultra->K_last_point +(ultra->Diff_Time/(FILTER_Ultra + ultra->Diff_Time))*(ultra->real-ultra->K_last_point);  
 		ultra->vel = ((float)((ultra->K_point) - (ultra->K_last_point))/ultra->Diff_Time);
-		ultra->main_vel=ultra->vel;
-		ultra->vel= ultra->last_vel + ( ultra->Diff_Time /(ultra->Diff_Time + FILTER_VEL_lpf )*(ultra->vel - ultra->last_vel));
-	  ultra->vel_hpf=(FILTER_VEL_hpf/(FILTER_VEL_hpf + ultra->Diff_Time) )*(ultra->vel - ultra->last_vel + ultra->last_vel_hpf) ;
+    ultra->K_last_point= ultra->K_point;
 
-			ultra->last_vel = ultra->vel;	
-			ultra->K_last_point= ultra->K_point;	
-	  ultra->last_vel_hpf = ultra->vel_hpf ;
-//		if(counter_loop==0){
-//			
-//											if(fabs( ultra->vel_hpf ) <= 35)
-//											{
-//													counter_loop=0;
-//												if(z_vel.need_2_res == 1)
-//												{
-//													z_vel.P =1;
-//													z_vel.need_2_res = 0;
-//												}
-//												ultra_noise=65;
-//												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);
-//													
+		if(fabs(ultra->last_vel - ultra->vel) <40)
+		{
+			ultra_noise=500;
+			Update_Kalman1x1(&z_vel,ultra->vel,acc_z,ultra_noise,3);			
 
-//											}
-//											
-//											else if( 35 < fabs( ultra->vel_hpf ) <250)
-//											{
-//												counter_loop=25;
-//												ultra_noise=1300;// + 3000*(ultra->vel/25);
-//												z_vel.need_2_res = 1;
-//												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);		
-//												
-//											}
-//											else 
-//												{
-//													counter_loop=25;
-//													z_vel.state = z_vel.state + acc_z * 0.4f;
-//												}
-//     }
-//    if(counter_loop > 0)
-//			{
-//				if(counter_loop>=1)
-//					{
-//				   counter_loop--;
-//					}
-//					
-//	     z_vel.state = z_vel.state + acc_z * 0.4f;		
-//				}
-//************************************************************************
-
-if(fabs( ultra->vel_hpf ) <= 35)
-											{
-													counter_loop=0;
-												if(z_vel.need_2_res == 1)
-												{
-													z_vel.P =1;
-													z_vel.need_2_res = 0;
-												}
-												ultra_noise=65;
-												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);
-													
-
-											}
-											
-											else if( 35 < fabs( ultra->vel_hpf )  && fabs( ultra->vel_hpf ) <50)
-											{
-												ultra_noise=2900;
-												z_vel.need_2_res = 1;
-												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);		
-												
-											}
-											else if( 50 <= fabs( ultra->vel_hpf )  && fabs( ultra->vel_hpf ) <60)
-											{
-												ultra_noise=3600;
-												z_vel.need_2_res = 1;
-												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);		
-												
-											}
-											else if( 60 <= fabs( ultra->vel_hpf )  && fabs( ultra->vel_hpf ) <250)
-											{
-												ultra_noise=6000;
-												z_vel.need_2_res = 1;
-												Update_Kalman1x1(&z_vel,ultra->vel,acc_z * 100,ultra_noise,3);		
-												
-											}
-											else 
-												{
-													z_vel.state = z_vel.state + acc_z * 0.4f;
-												}
-												
-	//*****************************************************************
-												
-
-		
 		}
-	
+		else if(fabs(ultra->last_vel - ultra->vel) <80)
+		{
+			ultra_noise=1500 + 3000*(ultra->vel/25);
+			Update_Kalman1x1(&z_vel,ultra->vel,acc_z,ultra_noise,3);			
+		}
+		else
+			z_vel.state = z_vel.state + acc_z * 0.4f;	
+		
+		ultra->last_vel = ultra->vel;		
+	}
 	else
 	{
 		z_vel.state = z_vel.state + acc_z * 0.4f;
 	}	
-	
 	return 1.0;
 }
+
 

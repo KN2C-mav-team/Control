@@ -2,7 +2,7 @@
 #define H_NRF_H
 
 #include "stm32f4xx_hal.h"
-#include "MS5611.h"
+#include "mpu6050.h"
 #include "stdarg.h"
 #include "mpu6050.h"
 #include "IMU.h"
@@ -10,7 +10,6 @@
 #include "Altitude.h"
 #include "Control.h"
 #include "Odometery.h"
-#include "Optical_Flow.h"
 
 
 #define		ACCEL							1
@@ -55,15 +54,6 @@
 #define   BAT               									29
 #define   Time                        				30
 #define   PTAM_DATA														31
-#define   Optical_Flow												32
-#define   opti_x_set													33
-#define   opti_x_read													34
-#define   opti_y_set													35
-#define   opti_y_read													36
-#define   opti_x_signal												37
-#define   opti_y_signal												38
-#define   Altitude_take_off_Gain              39
-#define   Altitude_take_off_Gain_set          40
 
 
  typedef struct {
