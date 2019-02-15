@@ -92,15 +92,16 @@ void MX_TIM13_Init(void);
 
 /* USER CODE BEGIN 0 */
 
-uint32_t Bat_=0;	
+uint32_t Bat_= 0;	
 int time=0,time_err=0,err_time=0;
 int omid;
 int counter_mpc_usart;
 int moj_counter_usart_intrupt=0;
-double clock_time=0;
-
+int clock_time=0;
+int test;
 uint64_t counter =0;					
 int lock_time ;
+char Run_State=GROUND_MODE;
 
 
 /* USER CODE END 0 */
@@ -110,7 +111,7 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 	
-	char Run_State=GROUND_MODE;
+	
 	char Run_Control =0;
 	uint32_t temp;
 
@@ -145,59 +146,17 @@ int main(void)
 
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_OC_Start_IT(&htim3,TIM_CHANNEL_1);
-	//HAL_UART_Receive_DMA(&huart4,&station_data,1);
-	//				__HAL_UART_FLUSH_DRREGISTER(&huart2);
 	
+	
+	//HAL_UART_Receive_DMA(&huart4,&station_data,1);
 	HAL_UART_Receive_DMA(&huart3,SBUS.buffer,25);
-	//HAL_UART_Receive_DMA(&huart4,MPC_2.MPC_UART_BUFF_2,MPC_BUFF_AMOUNT_2); //window 
-
-	HAL_UART_Receive_DMA(&huart1,MPC.MPC_UART_BUFF,MPC_BUFF_AMOUNT);//optical
+	//HAL_UART_Receive_DMA(&huart2,+MPC_2.MPC_UART_BUFF_2,MPC_BUFF_AMOUNT_2); //window 
+	HAL_UART_Receive_DMA(&huart4,MPC.MPC_UART_BUFF,MPC_BUFF_AMOUNT);//optical
 	
 
 	RC_Init(&RC,0);
 	HAL_TIM_Base_Start(&htim13);
 	
-	Mahony.q0=1.0f;
-	z_vel.state=0;
-	z_vel.C=1;
-	z_vel.A=1;
-	z_vel.B=DT;
-	z_vel.P=1;
-	z_vel.need_2_res =0;
-	
-	vel_marker_x.state=0;
-	vel_marker_x.C=1;
-	vel_marker_x.A=1;
-	vel_marker_x.B=DT;
-	vel_marker_x.P=1;
-	
-	vel_marker_y.state=0;
-	vel_marker_y.C=1;
-	vel_marker_y.A=1;
-	vel_marker_y.B=DT;
-	vel_marker_y.P=1;
-	
-	
-  orb_pos.state=0;
-	orb_pos.C=1;
-	orb_pos.A=1;
-	orb_pos.B=DT;
-	orb_pos.P=1;
-	orb_pos.need_2_res =0;
-	
-	MPC.ready = 0;
-	MPC_2.ready=0;
-	SBUS.state=0;
-	SBUS.m=0;
-	Cam_Kalman_init();
-	optical_kalman_init();
-	window_kalman_1x1_init();
-	 marker_kalman_1x1_init();
-	
-	Cam_Position.Scale_state = 0;
-	Cam_Position.Modified_POS_X = 0;
-	Cam_Position.Modified_POS_Y = 0;
-	Cam_Position.Modified_POS_Z = 0;
 
  
 
@@ -208,88 +167,92 @@ int main(void)
   while (1)
   {
 		
-		  clock_time++;
-			__HAL_TIM_SetCounter(&htim13,0);
-		
+			__HAL_TIM_SetCounter(&htim13 , 0);
+			clock_time++;
 			temp=htim3.Instance->CNT;
 			counter++;					
 			lock_time  = 1;
 		
 	  	Update_IMU_Data_Mahony(&Mahony,&Mpu);
-
+			
 				
-	     Read_Srf(htim3,&Ultra);
+	    Read_Srf(htim3,&Ultra);
       
    	 	recieve_sbus_radio(&SBUS,&RC);		   
-    //  ORB_get_data(&MPC,&MPC_2,&ORB_Position,&Mpu,&optical_par);    
-		  
-		  window_get_data(&MPC);   
-			do_optical_par(&MPC,&MPC_2,&Mpu,&optical_par,&Ultra);		
-		
-		  Rc2Controller(RC);			
-      Point2Controller(Mahony,Mpu);		
-		
-			if(counter%50 == 0 ){ 	
-			   Mpc_Empty_Data(&MPC);						
-    		 Mpc_Fill_Data(&MPC,4,(int)(Ultra.point),(int)(12),(int)( counter_flag_for_accept_window),(int)((int)(RC.RC_SW)+2));
-  			 Mpc_Send_Data(&MPC);	
+      		    
+					
+			if(counter%10 == 0 ){ 	
+//			   Mpc_Empty_Data(&MPC);						
+//    		 Mpc_Fill_Data(&MPC,1,(int)Ultra.point);
+//  			 Mpc_Send_Data(&MPC);
+				data1=10;
+				HAL_UART_Transmit(&huart4,&data1,1, 100);
 			 }
-         Check_MPC_IRQ(&MPC,&MPC_2)	;		
-			
-					switch(Run_State)
-	
-					{
-						case GROUND_MODE:
-							// SBUS_Packet_ground_mode();
-						
-						  SBUS_Packet_fly_mode();		
-							if(Quad_On(RC) == 1) {
-								Run_State=FLY_MODE;							
-								control_init_(); 
-								Set_zero_system_state();
-								Run_Control = 0;
-							}
-
-							break;
-						//*************************************************************************************
-						case FLY_MODE:
-				     if(Quad_Off(RC) == 1) Run_State=GROUND_MODE; 
-						
-						   Window_detection(&window_detection ,&MPC )	;	 //sw	
-					  	//Velocity_Control(&Velocity);	  //
-              Control_Altitude_Velocity(RC.HOV_PIT);	
-            					
-						//  Marker_Position_Control(&Marker_Position,&MPC);
-
-						// ORB_Position_control(&ORB_position,&MPC); 	
-             //Third_Person_control(int _Roll_setpoint,int _Pitch_setpoint ,int _Yaw_point,int corrected_Roll_setpoint,int corrected_Pitch_setpoint)
-	
-             SBUS_Packet_fly_mode();					
-							break;
-						//*************************************************************************************
-						default:
-							Run_State = GROUND_MODE;
-							break;
-					}
+			 
+       Check_MPC_IRQ(&MPC,&MPC_2)	;
+			 do_optical_par(&MPC,&MPC_2,&Mpu,&optical_par,&Ultra);
 				
+		switch(Run_State)
+
+		{
+			case GROUND_MODE:
+										
+				SBUS_Packet_fly_mode();	
+				if(clock_time%100 == 0 ){			
+					HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_11);
+					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,0);
+				}
+			
+				if(Quad_On(RC) == 1) {
+					Run_State=FLY_MODE;							
+					control_init_(); 
+					Set_zero_system_state();
+					Run_Control = 0;
+					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_11,0);
+					HAL_GPIO_WritePin(GPIOE,GPIO_PIN_14,1);
 					
-					if(htim3.Instance->CNT > temp)
-						time = htim3.Instance->CNT-temp;
-					else
-						time = ( htim3.Instance->CNT - temp) +0xffff;
-					
-					if(time>=5000)	
-					{
-						time_err++;		
-						err_time=time;
-					}
-					
-					while(__HAL_TIM_GetCounter(&htim13) < DT_PULSE)
-					{
-						omid = __HAL_TIM_GetCounter(&htim13);
-					}
-					
-            counter_mpc_usart= htim3.Instance->CNT;
+				}
+
+				break;
+			//*************************************************************************************
+			case FLY_MODE:
+			 if(Quad_Off(RC) == 1) Run_State=GROUND_MODE; 
+			
+			 if(clock_time%25 == 0 ){
+				 HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_14);
+				 HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_11);
+			 }
+			 
+
+			Altitude_control(RC.THR_CUT);
+			Velocity_Control(&Velocity);
+			//Window_detection(&window_detection,&MPC);
+			SBUS_Packet_fly_mode();					
+				break;
+			//*************************************************************************************
+			default: 
+				Run_State = GROUND_MODE;
+				break;
+		}
+	
+		
+		if(htim3.Instance->CNT > temp)
+			time = htim3.Instance->CNT-temp;
+		else
+			time = ( htim3.Instance->CNT - temp) +0xffff;
+		
+		if(time>=DT_PULSE)	
+		{
+			time_err++;		
+			err_time=time;
+		}
+		
+		while(__HAL_TIM_GetCounter(&htim13) < DT_PULSE)
+		{
+			omid = __HAL_TIM_GetCounter(&htim13);
+		}
+		
+			counter_mpc_usart= htim3.Instance->CNT;
   }
   /* USER CODE END 3 */
 
@@ -384,7 +347,7 @@ void MX_UART4_Init(void)
 {
 
   huart4.Instance = UART4;
-  huart4.Init.BaudRate = 57600;
+  huart4.Init.BaudRate = 9600;
   huart4.Init.WordLength = UART_WORDLENGTH_8B;
   huart4.Init.StopBits = UART_STOPBITS_1;
   huart4.Init.Parity = UART_PARITY_NONE;
@@ -425,7 +388,7 @@ void MX_USART1_UART_Init(void)
 {
 
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 57600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -740,7 +703,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if(huart->Instance == UART4)
 	{	
 			
-   MPC_2.UART_IRQ_FLAG	= 1;	
+   MPC.UART_IRQ_FLAG	= 1;
 
 	}
 	
@@ -750,98 +713,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			
 		
 	}
-//	if(CAM_IRQ_Flag)
-//	{
-			else if(huart->Instance == USART1 )
+
+			else if(huart->Instance == USART2 )
 		{
 
-		//	 __HAL_UART_FLUSH_DRREGISTER(&huart1);
-//		
-						moj_counter_usart_intrupt++;
-				MPC.UART_IRQ_FLAG	= 1;	
+				moj_counter_usart_intrupt++;
+				MPC_2.UART_IRQ_FLAG	= 1;	
 			
-//			switch(MPC.pack_started)
-//				{
-//					
-//					case 0:
-//						if(MPC.MPC_UART_BUFF[0] == 0xff)
-//							MPC.pack_started = 1;
-//						else
-//							MPC.pack_started = 0;
-//						break;
-//						
-//					case 1:
-//						if(MPC.MPC_UART_BUFF[0] == 0xff)
-//							MPC.pack_started = 2;
-//						else
-//							MPC.pack_started = 0;
-//						break;
-//						
-//					case 2:
-//						MPC.Len =MPC.MPC_UART_BUFF[0] - 3;
-//						MPC.pack_started = 3;
-//						break;
-//						
-//					case 3:
-//						if(MPC.MPC_UART_BUFF[0] == 0)
-//							MPC.pack_started = 4;
-//						else
-//							MPC.pack_started = 0;
-//						break;
-//					case 4:
-//						
-//						if(MPC.Len == 0)
-//						{
-//							
-//							MPC.sum = MPC.sum + (uint8_t)MPC.MPC_UART_BUFF[0];
-//							if(MPC.sum == 0)
-//							{
-//								MPC.sum=0;
-//								MPC.pack_started =0;
-//								MPC.ready =1;		
-//								MPC.data_num = MPC.j;
-//								MPC.j=0;
-//							}
-//							else
-//							{
-//								MPC.j=0;
-//								MPC.sum=0;
-//								MPC.pack_started =0;
-//							}
-//							
-//						}
-//						else
-//						{
-//							MPC.sum = MPC.sum + (uint8_t)MPC.MPC_UART_BUFF[0];
-//							MPC.conv.byte[0] = MPC.MPC_UART_BUFF[0];
-//							MPC.pack_started =5;
-//						}
-//						break;
-//					case 5:
-//							MPC.sum = MPC.sum + (uint8_t)MPC.MPC_UART_BUFF[0];
-//							MPC.conv.byte[1] = MPC.MPC_UART_BUFF[0];
-//							MPC.pack_started =4;
-//							MPC.data[MPC.j] = MPC.conv.real;
-//							MPC.Len = MPC.Len - 2;
-//							MPC.j++;				
-//						break;
-//						
-//				}
-			
-				
-		
-//			//conuter_mpc_usart = __HAL_TIM_GetCounter(&htim13);
+
 		}
-////		else if(huart->Instance == UART4)
-////		{
-////			moj_interupt_usart_rc++;
-////			data_r = 1;
-////			if(station_data == 's') RC.init = 0;
-////			//HAL_UART_Transmit(&huart1,&rxbuff,1,100);
-////			//HAL_UART_Receive_IT(&huart1,(uint8_t *)aRxBuffer,1);
-////		}
-////	}
-	
+
 }
 
 
@@ -870,7 +751,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	
 	//if(GPIO_Pin == GPIO_PIN_8)
-	{
+	
 		if(Ultra.State == 1 && HAL_GPIO_ReadPin(GPIOB,GPIO_Pin) ==1)
 		{
 			Ultra.Begine = (uint16_t)htim3.Instance->CNT;
@@ -880,11 +761,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		else if(Ultra.State == 2 && HAL_GPIO_ReadPin(GPIOB,GPIO_Pin) ==0)
 		{
 			Ultra.End = (uint16_t)htim3.Instance->CNT;
-			Ultra.State = 3;
+			Ultra.State = 0;
 			Ultra.ready = 1;
 
 		}
-  }
+  
 }
 
 
@@ -894,7 +775,7 @@ void MX_TIM13_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim13.Instance = TIM13;
-  htim13.Init.Prescaler = SystemCoreClock/(2*1000000);
+  htim13.Init.Prescaler = 83;
   htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim13.Init.Period = 0xffff;
   htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

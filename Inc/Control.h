@@ -76,12 +76,12 @@
 #define	Max_Altitude_Range										250
 
 #define ALTITUDE_LIMIT                        300     // moj
-#define ALTITUDE_TAKE_OFF_MAX                125.0f  //MOJ
-#define Ground_ALTITUDE                       4.0f    //moj
+#define ALTITUDE_TAKE_OFF_MAX                75.0f  //MOJ
+#define Ground_ALTITUDE                       0.0f    //moj
 
 #define Altitude_Velocity_GAIN_SET						1					//**//
 
-#define Field_of_view_tan_X                  ( tan(ToRad(31)))
+#define Field_of_view_tan_X                   (tan(ToRad(31)))
 #define Field_of_view_tan_Y                   (tan(ToRad(25)))
 
 
@@ -163,6 +163,7 @@ extern _3D_Vector Velocity;
 extern _3D_Vector ORB_position;
 extern _3D_Vector Marker_Position;
 extern _3D_Vector window_detection;
+extern _3D_Vector Obstacle;
 
 
 extern _Kalman1x1 vel_marker_x,vel_marker_y,window_x,window_y;
@@ -178,8 +179,7 @@ void Set_zero_system_state(void);
 int  Control(System_Status *In);
 void control_init_(void);
 
-void Control_Altitude_Velocity(int Alt_Control_SW);
-void altitude_control(int Alt_Control_THR);
+
 void Fuzzy_Gain(char controler);
 void Velocity_Control(_3D_Vector *Velocity);
 void First_Person_control();
@@ -187,8 +187,10 @@ void Third_Person_control(int _Roll_setpoint,int _Pitch_setpoint ,int _Yaw_point
 void ORB_Position_control(_3D_Vector *ORB_position,_MPC *MPC);
 void Window_detection(_3D_Vector *window_detection ,_MPC *MPC );
 void Marker_Position_Control(_3D_Vector *Marker_Position,_MPC *MPC);
+void obstacle(_3D_Vector *Obstacle);
 void marker_kalman_1x1_init();
 void window_kalman_1x1_init();
+void Altitude_control(int Alt_Control_THR);
 
 
 int Quad_On(_RC Rc);

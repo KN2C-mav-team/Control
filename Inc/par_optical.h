@@ -8,7 +8,7 @@
 #include "math.h"
 #include "Kalman.h"
 
-#define focal_pix   3// 290
+#define focal_pix   1// 290
 
 #define acc_noise    3
 #define opti_noise   25

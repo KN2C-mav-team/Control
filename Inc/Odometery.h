@@ -47,7 +47,7 @@ void Correct_ORB_POS(Odometery_Pro *ORB_POS);
 void Scaling_ORB_POS(Odometery_Pro *ORB_POS,_MPC *MPC,float Height);
 void ORB_get_data(_MPC* Mpc,_MPC* Mpc_2,Odometery_Pro *ORB_POS,MPU_SENSOR *sen,optical_par_struct *opti);
 void ORB_Kalman_init(void);
-void window_get_data(_MPC* Mpc);
+void Marker_get_data(_MPC* Mpc);
 
 
 #endif 

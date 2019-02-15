@@ -12,8 +12,6 @@ float vel_z;
 int start_vel_z_kalman =0;
 int counter_loop=0;
 
-
-
 void Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra)
 {
 
@@ -21,12 +19,14 @@ void Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra)
 	ultra->fail = ultra->fail + 1;
 	counter_loop++;
 	
+if (counter_loop < 5){
+	
 	if(ultra->State == 0)
 	{	
 		if(ultra->ready == 1)
 		{
 			if(ultra->Begine < ultra->End)
-				ultra->real = (((float)(ultra->End - ultra->Begine) /200)* 3.3f); //200;
+				ultra->real = (((float)(ultra->End - ultra->Begine) /200)* 3.3f); //3.3 baraye ultra asl
 			else
 				ultra->real = (((float)(ultra->End - ultra->Begine + 0xffff) /200)* 3.3f);
 			
@@ -44,8 +44,7 @@ void Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra)
 				ultra_filter_lpf(ultra); 	//** For Control Z Position Enable this		
 				//Ultra.last_real=Ultra.real;		// DAME MOSABEGHATI GIR NADID DIGE!!!!
 			}
-			else
-				ultra->ready = 0;			
+		
 		}	
 		
 		Ultra_Trig_ON;
@@ -68,6 +67,11 @@ void Read_Srf(TIM_HandleTypeDef _htim,_Ultra* ultra)
 	
 	if(ultra->fail >16)
 		ultra->State = 0;
+}
+else {
+	counter_loop = 0;
+	ultra->State = 0;
+	ultra->ready = 0;}
 }
 
 void Ultra_Kalman_init(void)
@@ -97,7 +101,7 @@ void Ultra_Kalman_init(void)
 void  ultra_filter_lpf(_Ultra* ultra)
 {
 	float filter,f_cut;
-	f_cut=2; //2
+	f_cut=1.5; //2
 	filter =1/(2*3.14f*f_cut);			
 	ultra->point = ultra->last_point +(ultra->Diff_Time/(filter + ultra->Diff_Time))*(ultra->real-ultra->last_point);  
 	

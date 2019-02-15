@@ -30,8 +30,8 @@
 #define Roll_channel      5         //2        5
 #define Pitch_channel     7         //1        7
 #define Yaw_channel       4         //3        4
-#define RC_SW_channel     2          //4       2 
-#define HOV_THR_channel   0          //5        1
+#define RC_SW_channel     0          //4       2 
+#define HOV_THR_channel   2          //5        1
 #define RC_TRIM_channel   1           //7      0
 #define HOV_PIT_channel   3          //6       3
 
